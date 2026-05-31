@@ -1157,7 +1157,8 @@ function callOpenRouter2(imageLink, prompt) {
   var url = "https://openrouter.ai/api/v1/chat/completions";
 
   var headers = {
-    // data in .env
+    "Authorization": "Bearer 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",
+    "Content-Type": "application/json"
   };
 
   // "model": "meta-llama/llama-3.2-90b-vision-instruct",
@@ -1483,6 +1484,68 @@ function toPipeline() {
   const o = addRowFromObject(myObj, pipelineSheet);
 
 }
+
+function askOpenRouterAI(email) {
+  // Define your API key and other configurations
+  const OPENROUTER_API_KEY = "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";
+  // const YOUR_SITE_URL = "your-site-url-here";     // Replace with your site URL
+  // const YOUR_SITE_NAME = "your-site-name-here";   // Replace with your site name
+
+  // const question = "Can you rewrite the following email: Hi Michael, We talked a while back about https://www.realtor.com/realestateandhomes-detail/Campbell-Rd_Herbster_WI_54844_M92817-42723?from=srp , but someone else ended up buying it. Have you come across any similar properties recently in Bayfield? I'm interested in properties with a mild slope , a small amount of ground water/flood plain and legal road access. I can make an all cash offer and move quickly. Thank you - Dan"
+
+
+  const question = "With the role of a real estate investor, can you rewrite the following email,including the provided url and return the subject and body as json using html syntax: " + email;
+
+  // API endpoint
+  const url = "https://openrouter.ai/api/v1/chat/completions";
+
+  // Request payload
+  const payload = {
+    model: "google/learnlm-1.5-pro-experimental:free",
+    messages: [
+      { role: "user", content: question } // Dynamically insert user's question
+    ],
+    top_p: 1,
+    temperature: 1,
+    repetition_penalty: 1
+  };
+
+  // Request headers
+  const headers = {
+    Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+    "Content-Type": "application/json"
+  };
+
+  // Request options
+  const options = {
+    method: "post",
+    headers: headers,
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  try {
+    // Make the HTTP POST request
+    const response = UrlFetchApp.fetch(url, options);
+
+    // Parse the JSON response
+    const jsonResponse = JSON.parse(response.getContentText());
+
+    // Log the full response for debugging
+    Logger.log("Full Response: " + JSON.stringify(jsonResponse));
+
+    // Extract and return the AI's response
+    const aiResponse = jsonResponse.choices[0]?.message?.content || "No response received.";
+    return aiResponse;
+
+  } catch (error) {
+    // Log and handle errors
+    Logger.log("Error: " + error.message);
+    return "An error occurred while communicating with the AI.";
+  }
+}
+
+
 function SendTodaysOutreachEmails() {
 
   // eg 35, 70, 105 days later ...

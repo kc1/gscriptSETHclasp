@@ -127,18 +127,13 @@ function refineMismatchedPrompts() {
 }
 
 function genericPromptStage1(responseColumnName, sheetName) {
-
   Logger.log(sheetName);
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-
 
   const currentSheetObjArr = sheet2Json(sheet);
   Logger.log("first 2 ");
   Logger.log(currentSheetObjArr[0]);
   Logger.log(currentSheetObjArr[1]);
-
-
-
 
   // Filter rows that haven't been processed yet (no RoadAvailable prompt? Wait, adjust filter as needed)
   // Assuming you want rows where GeneratedAnswer is empty
@@ -153,7 +148,7 @@ function genericPromptStage1(responseColumnName, sheetName) {
   Logger.log(`Rows to process: ${toProcess.length}`);
 
   // Process first 10 (or all if you prefer)
-  const firstXPushedRows = toProcess.slice(0, 20);
+  const firstXPushedRows = toProcess.slice(0, 8);
 
   if (firstXPushedRows.length === 0) {
     Logger.log("No new rows to process.");
@@ -162,62 +157,50 @@ function genericPromptStage1(responseColumnName, sheetName) {
 
   Logger.log(JSON.stringify(firstXPushedRows));
 
-  const url = APIURL + "openRouterPrompt";
+  const url = APIURL + "openRouterPrompt2";
   Logger.log(url);
 
+  var options = {
+    method: "post",
+    contentType: "application/json",
+    payload: JSON.stringify({
+      myrows: firstXPushedRows,
+      model: "google/gemini-2.5-flash",
+    }),
+    muteHttpExceptions: true,
+  };
 
-  for (let i = 0; i < firstXPushedRows.length; i++) {
-    const rowToSend = firstXPushedRows[i];
-    Logger.log(`Sending row ${rowToSend.ID} to OpenRouter`);
+  Logger.log("payload");
+  Logger.log(JSON.stringify({
+      myrows: firstXPushedRows,
+      model: "google/gemini-2.5-flash",
+    }));
+      // model: "stepfun/step-3.7-flash",
 
-    var options = {
-      method: "post",
-      contentType: "application/json",
-      payload: JSON.stringify(
-        Object.assign({}, rowToSend, {
-          PROMPT: rowToSend.PROMPT,
-          ScreenshotURL: rowToSend.ScreenshotURL || rowToSend.ScreenshotURL || "",
-          model: "stepfun/step-3.7-flash", // default model for stage 1
-        }),
-      ),
-      muteHttpExceptions: true,
-    };
+  let responseObj;
 
-    Logger.log("payload");
-    Logger.log(JSON.stringify(rowToSend));
+  try {
+    const response = UrlFetchApp.fetch(url, options);
+    const httpCode = response.getResponseCode();
+    const body = response.getContentText();
+    Logger.log(httpCode);
+    Logger.log(body);
+     responseObj = parseSurveyorResponse(body);
+  } catch (error) {
+    Logger.log(error);
+  }
 
-    try {
-      const response = UrlFetchApp.fetch(url, options);
-      const httpCode = response.getResponseCode();
-      const body = response.getContentText();
-      Logger.log(httpCode);
-      Logger.log(body);
-      // let text = body.trim();
-      // if (text.startsWith('[')) {
-      //   const arr = JSON.parse(text);
-      //   text = arr[0];
-      // }
-      // text = text.replace(/\\"/g, '"').replace(/\\n/g, '\n');
-      const responseObj = parseSurveyorResponse(body);
+  Logger.log("HERE:");
 
-      // const responseObj = JSON.parse(body);
+  Logger.log(responseObj);
 
-      // const match = body.match(/\{[\s\S]*?\}/);
+  for (let i = 0; i < responseObj.length; i++) {
+    const myRow = responseObj[i];
+    const jsonString = myRow[responseColumnName];
+    const parsed = parseSurveyorResponse(jsonString);
 
-      // const jsonOnly = match ? match : null;
-      // console.log(jsonOnly);
-      // const responseObj = parseSurveyorResponse(body);
-      // responseObj = JSON.parse(jsonOnly);
-      Logger.log("HERE:");
-
-      Logger.log(responseObj);
-
-      let YN = responseObj[responseColumnName];
-      var C = updateCell(sheet, rowToSend, responseColumnName, YN);
-      // }
-    } catch (error) {
-      Logger.log(`Error processing row ${rowToSend.ID}: ${error}`);
-    }
+    let YN = parsed[responseColumnName] || "";
+    var C = updateCell(sheet, myRow, responseColumnName, YN);
   }
 }
 
@@ -379,7 +362,7 @@ function createUnifiedPrompt() {
       SpreadsheetApp.getUi().alert(
         "Need at least 8 MATCH rows on OPTIMIZER (with PROMPT > 40 chars and NealNotes).",
       );
-    } catch (e) { }
+    } catch (e) {}
     return;
   }
 
@@ -441,7 +424,7 @@ function createUnifiedPrompt() {
         SpreadsheetApp.getUi().alert(
           "openRouterPrompt failed (HTTP " + httpCode + "). See execution log.",
         );
-      } catch (e) { }
+      } catch (e) {}
       return;
     }
 
@@ -459,15 +442,15 @@ function createUnifiedPrompt() {
       Logger.log("openRouterPrompt error: " + parsed.error);
       try {
         SpreadsheetApp.getUi().alert("API error: " + parsed.error);
-      } catch (e) { }
+      } catch (e) {}
       return;
     } else {
       unifiedPrompt = String(
         parsed.unifiedPrompt ||
-        parsed.prompt ||
-        parsed.text ||
-        parsed.content ||
-        "",
+          parsed.prompt ||
+          parsed.text ||
+          parsed.content ||
+          "",
       ).trim();
     }
 
@@ -481,23 +464,23 @@ function createUnifiedPrompt() {
         SpreadsheetApp.getUi().alert(
           "Unified prompt created. See cells I1–I2 on OPTIMIZER.",
         );
-      } catch (e) { }
+      } catch (e) {}
     } else {
       Logger.log(
         "Failed to extract unified prompt from response; body length: " +
-        (body && body.length),
+          (body && body.length),
       );
       try {
         SpreadsheetApp.getUi().alert(
           "Could not parse a long enough unified prompt. Check execution log for raw body.",
         );
-      } catch (e) { }
+      } catch (e) {}
     }
   } catch (error) {
     Logger.log("Error in createUnifiedPrompt: " + error);
     try {
       SpreadsheetApp.getUi().alert("Error: " + error);
-    } catch (e) { }
+    } catch (e) {}
   }
 }
 
@@ -514,7 +497,7 @@ function createUnifiedPrompt2() {
       SpreadsheetApp.getUi().alert(
         'Sheet "OPTIMIZER" not found. Rename or activate the optimizer sheet.',
       );
-    } catch (e) { }
+    } catch (e) {}
     return;
   }
 
@@ -555,7 +538,7 @@ function createUnifiedPrompt2() {
       SpreadsheetApp.getUi().alert(
         "Need at least 8 MATCH rows on OPTIMIZER (with PROMPT > 40 chars and NealNotes).",
       );
-    } catch (e) { }
+    } catch (e) {}
     return;
   }
 
@@ -620,7 +603,7 @@ function createUnifiedPrompt2() {
         SpreadsheetApp.getUi().alert(
           "openRouterPrompt failed (HTTP " + httpCode + "). See execution log.",
         );
-      } catch (e) { }
+      } catch (e) {}
       return;
     }
 
@@ -638,15 +621,15 @@ function createUnifiedPrompt2() {
       Logger.log("openRouterPrompt error: " + parsed.error);
       try {
         SpreadsheetApp.getUi().alert("API error: " + parsed.error);
-      } catch (e) { }
+      } catch (e) {}
       return;
     } else {
       unifiedPrompt = String(
         parsed.unifiedPrompt ||
-        parsed.prompt ||
-        parsed.text ||
-        parsed.content ||
-        "",
+          parsed.prompt ||
+          parsed.text ||
+          parsed.content ||
+          "",
       ).trim();
     }
 
@@ -654,29 +637,29 @@ function createUnifiedPrompt2() {
       sheet.getRange("I2").setValue(unifiedPrompt);
       Logger.log(
         "Unified prompt (v2, version-weighted) written to I2, length: " +
-        unifiedPrompt.length,
+          unifiedPrompt.length,
       );
       try {
         SpreadsheetApp.getUi().alert(
           "Unified prompt created (refined examples first). See I2 on OPTIMIZER.",
         );
-      } catch (e) { }
+      } catch (e) {}
     } else {
       Logger.log(
         "Failed to extract unified prompt from response; body length: " +
-        (body && body.length),
+          (body && body.length),
       );
       try {
         SpreadsheetApp.getUi().alert(
           "Could not parse a long enough unified prompt. Check execution log for raw body.",
         );
-      } catch (e) { }
+      } catch (e) {}
     }
   } catch (error) {
     Logger.log("Error in createUnifiedPrompt2: " + error);
     try {
       SpreadsheetApp.getUi().alert("Error: " + error);
-    } catch (e) { }
+    } catch (e) {}
   }
 }
 
