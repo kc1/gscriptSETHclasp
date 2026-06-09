@@ -1,15 +1,25 @@
-function roadAvailabilityPromptStage1() {
+function waterPromptStage1() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const sheetName = sheet.getName();
-  if (!sheetName == "OPTIMIZER") {
+  if (!sheetName == "WaterOPTIMIZER") {
     SpreadsheetApp.getActiveSpreadsheet().toast(
-      "Switch to an OPTIMIZER sheet.",
+      "Switch to the WaterOPTIMIZER sheet.",
       "promptStage1",
       5,
     );
     return;
   }
-  const x = genericPromptStage1("RoadAvailable", sheet);
+  const x = genericPromptStage1("Buildable", "WaterOPTIMIZER", "openRouterPromptWater");
+}
+
+function waterStatusMatches() {
+  const out = statusCalculator(
+    "Buildable",
+    "NealsNotes",
+    "Status",
+    "WaterOPTIMIZER",
+  );
+  Logger.log(out);
 }
 
 function structurePresentPromptStage1() {
@@ -26,14 +36,37 @@ function structurePresentPromptStage1() {
   const x = genericPromptStage1("StructuresPresent", "ImprovementOPTIMIZER");
 }
 
-function stage1Status() {
-  const out = statusCalculator("RoadAvailable", "NealsNotes", "Status");
+function roadAvailabilityPromptStage1() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const sheetName = sheet.getName();
+  if (!sheetName == "OPTIMIZER") {
+    SpreadsheetApp.getActiveSpreadsheet().toast(
+      "Switch to an OPTIMIZER sheet.",
+      "promptStage1",
+      5,
+    );
+    return;
+  }
+  const x = genericPromptStage1("RoadAvailable", sheet);
+}
+
+function BuildingStatusMatches() {
+  const out = statusCalculator(
+    "StructuresPresent",
+    "NealsNotes",
+    "Status",
+    "ImprovementOPTIMIZER",
+  );
   Logger.log(out);
 }
 
-function statusCalculator(column1, column2, outputColumn) {
-  const sheet =
-    SpreadsheetApp.getActiveSpreadsheet().getSheetByName("OPTIMIZER");
+function stage1Status() {
+  const out = statusCalculator("Generated", "NealsNotes", "Status");
+  Logger.log(out);
+}
+
+function statusCalculator(column1, column2, outputColumn, sheetname) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetname);
   let currentSheetObjArr = sheet2Json(sheet);
   Logger.log("length: " + currentSheetObjArr.length);
 
@@ -42,7 +75,7 @@ function statusCalculator(column1, column2, outputColumn) {
       [2, 3].includes(row[column1].length) &&
       [2, 3].includes(row[column2].length) &&
       row.PROMPT &&
-      row.RoadURL.includes("http")
+      row.ScreenshotURL.includes("http")
     );
   });
 
@@ -126,7 +159,7 @@ function refineMismatchedPrompts() {
   Logger.log("Prompt refinement completed. Now run promptStage1");
 }
 
-function genericPromptStage1(responseColumnName, sheetName) {
+function genericPromptStage1(responseColumnName, sheetName,netlifyFunctionName="openRouterPrompt2") {
   Logger.log(sheetName);
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
 
@@ -148,7 +181,7 @@ function genericPromptStage1(responseColumnName, sheetName) {
   Logger.log(`Rows to process: ${toProcess.length}`);
 
   // Process first 10 (or all if you prefer)
-  const firstXPushedRows = toProcess.slice(0, 8);
+  const firstXPushedRows = toProcess.slice(0, 10);
 
   if (firstXPushedRows.length === 0) {
     Logger.log("No new rows to process.");
@@ -157,7 +190,7 @@ function genericPromptStage1(responseColumnName, sheetName) {
 
   Logger.log(JSON.stringify(firstXPushedRows));
 
-  const url = APIURL + "openRouterPrompt2";
+  const url = APIURL + netlifyFunctionName;
   Logger.log(url);
 
   var options = {
@@ -165,17 +198,19 @@ function genericPromptStage1(responseColumnName, sheetName) {
     contentType: "application/json",
     payload: JSON.stringify({
       myrows: firstXPushedRows,
-      model: "google/gemini-2.5-flash",
+      model: "set in netlify",
     }),
     muteHttpExceptions: true,
   };
 
   Logger.log("payload");
-  Logger.log(JSON.stringify({
+  Logger.log(
+    JSON.stringify({
       myrows: firstXPushedRows,
-      model: "google/gemini-2.5-flash",
-    }));
-      // model: "stepfun/step-3.7-flash",
+      model: "set in netlify",
+    }),
+  );
+  // model: "stepfun/step-3.7-flash",
 
   let responseObj;
 
@@ -185,7 +220,7 @@ function genericPromptStage1(responseColumnName, sheetName) {
     const body = response.getContentText();
     Logger.log(httpCode);
     Logger.log(body);
-     responseObj = parseSurveyorResponse(body);
+    responseObj = parseSurveyorResponse(body);
   } catch (error) {
     Logger.log(error);
   }
@@ -195,12 +230,19 @@ function genericPromptStage1(responseColumnName, sheetName) {
   Logger.log(responseObj);
 
   for (let i = 0; i < responseObj.length; i++) {
-    const myRow = responseObj[i];
-    const jsonString = myRow[responseColumnName];
-    const parsed = parseSurveyorResponse(jsonString);
+    try {
+      const myRow = responseObj[i];
+      const jsonString = myRow.GeneratedResponse;
+      const parsed = parseSurveyorResponse(jsonString);
 
-    let YN = parsed[responseColumnName] || "";
-    var C = updateCell(sheet, myRow, responseColumnName, YN);
+      let YN = parsed[responseColumnName] || "";
+      // let YN = parsed["buildable"] || "";
+
+      var C = updateCell(sheet, myRow, responseColumnName, YN);
+    } catch (e) {
+      Logger.log(`Error processing row ${i}: ${e}`);
+      var C = updateCell(sheet, myRow, responseColumnName, "ERROR");
+    }
   }
 }
 
