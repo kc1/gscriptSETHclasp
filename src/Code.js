@@ -2,22 +2,56 @@ function onOpen() {
   // var ui = SpreadsheetApp.getUi();
   const ss = SpreadsheetApp.getActive();
 
+ 
+
   const menu = [
+
+    { name: '1A) Push Road and Building Rows to collection (alcornGeoJsonBucket) 30', functionName: 'alcornGeoJsonPush' },
+
+    { name: '1B) Run buildScreenshotsFromLink (runSethApp) with IMAGEAI to generate screenshots ', functionName: 'postToBuildScreenshotsFromLink' },
+
+    { name: '1C) Update PUSHED rows with Road Screenshot Links from collection (alcornGeoJsonBucket)-- wait 30 min', functionName: 'updateWithRoadandBuildingScreenshotPaths' },
+
+    { name: '1D)  Y/N on Available Road using WaterURL with LLM  -- works in parallel', functionName: 'roadAvailableUsingLLM' },
+
+    { name: '-----------------------------------------------------------------------', functionName: 'dummy' },
+    { name: '2A) Push Road and Building Rows to collection (alcornGeoJsonBucket) 30', functionName: 'alcornGeoJsonPush2' },
+
+    { name: '2B) Run buildScreenshotsFromLink (runSethApp) with IMAGEAI to generate screenshots ', functionName: 'postToBuildScreenshotsFromLink2' },
+
+    { name: '2C) Update PUSHED rows with Road Screenshot Links from collection (alcornGeoJsonBucket)-- wait 30 min', functionName: 'updateWithRoadandBuildingScreenshotPaths2' },
+
+    { name: '2D)  Y/N on Available Road using WaterURL with LLM  -- works in parallel', functionName: 'roadAvailableUsingLLM2' },
+
+    { name: '------------------------------------------------------------------', functionName: 'dummy2' },
+
+
 
     { name: '1) Push to Named Bucket (up to 50), for home access-then run with IMAGEAI to generate screenshots', functionName: 'alcornPush' },
     , { name: '2) Run sethProp (runSethApp) with IMAGEAI to generate screenshots --api updated', functionName: 'postToSethProp' },
 
-    { name: '3) Update selected rows with Screenshot Links from Named Mongo bucket (alcornBucket) ', functionName: 'updateWithScreenshotPaths' },
+    { name: '3) Update selected rows with Screenshot Links from Named Mongo bucket (alcornBucket) ', functionName: 'updateWithScreenshotPaths' }
+  ]
+
+  ss.addMenu('Extended', menu);
+
+ const menu2 = [
+
+    { name: '1A) Push Road and Building Rows to collection (alcornGeoJsonBucket) 30', functionName: 'alcornGeoJsonPush' },
+
+    { name: '1B) Run buildScreenshotsFromLink (runSethApp) with IMAGEAI to generate screenshots ', functionName: 'postToBuildScreenshotsFromLink' },
+
+    { name: '1C) Update PUSHED rows with Road Screenshot Links from collection (alcornGeoJsonBucket)-- wait 30 min', functionName: 'updateWithRoadandBuildingScreenshotPaths' },
+
+    { name: '1D)  Y/N on Available Road using WaterURL with LLM  -- works in parallel', functionName: 'roadAvailableUsingLLM' },
+
+    { name: '-----------------------------------------------------------------------', functionName: 'dummy' },
+
+    
 
     // { name: '4A) GeoJSONio url builder from collection', functionName: 'GeoJSONioUrlBuilder' },
 
-    { name: '4A) Push Road and Building Rows to collection (alcornGeoJsonBucket)', functionName: 'alcornGeoJsonPush' },
 
-    { name: '4B) Run buildScreenshotsFromLink (runSethApp) with IMAGEAI to generate screenshots ', functionName: 'postToBuildScreenshotsFromLink' },
-
-    { name: '4C) Update PUSHED rows with Road Screenshot Links from collection (alcornGeoJsonBucket)-- wait 30 min', functionName: 'updateWithRoadandBuildingScreenshotPaths' },
-
-    { name: '4D)  Y/N on Available Road using WaterURL with LLM  -- works in parallel', functionName: 'roadAvailableUsingLLM' },
 
 
 
@@ -35,7 +69,7 @@ function onOpen() {
     { name: '10) If its still interesting Send Row to Pipeline', functionName: 'toPipeline' },
     { name: 'Distance to Closest Walmart', functionName: 'getWallmartDistance' },
 
-    { name: '-----------------------------------------------------------------------', functionName: 'dummy' },
+    // { name: '-----------------------------------------------------------------------', functionName: 'dummy' },
 
 
 
@@ -47,12 +81,9 @@ function onOpen() {
     { name: 'Create a Planning/Zoning map review request message in Message field (for email only) - Need to have kml file ready for review', functionName: 'createMessagePZ' },
 
     { name: 'Select Row and send PZ department an email', functionName: 'sendEmailToPZFromRow' },
-    // { name: '-----------------------------------------------------------------', functionName: 'dummy' },
+    // { name: '-----------------------------------------------------------------', functionName: 'dummy' }
 
   ]
-  ss.addMenu('Extended', menu);
-
-  // const menu2 = [];
 
   const menu3 = [
     { name: 'Add Agent to Follow Up', functionName: 'followAgent' },
@@ -89,9 +120,9 @@ function tester() {
   Utilities.sleep(210 * 1000)
   getNewWIProps();
 }
-function dummy() {
-}
 
+function dummy() { }
+function dummy2() { }
 /**
  * Safely parses the JSON response from your Vision AI prompt.
  * Strips out any Markdown text formatting first.
@@ -102,28 +133,28 @@ function dummy() {
 function parseSurveyorResponse(responseText) {
   // 1. Trim whitespace
   let cleanText = responseText.trim();
-  
+
   // 2. Use a Regular Expression to strip Markdown code blocks
   // This removes ```json or ``` at the start, and ``` at the end.
-cleanText = cleanText
-  .replace(/^["']*\s*```(?:json)?/i, '')
-  .replace(/\s*["']*```$/i, '')
-  .trim();  
+  cleanText = cleanText
+    .replace(/^["']*\s*```(?:json)?/i, '')
+    .replace(/\s*["']*```$/i, '')
+    .trim();
   // 3. Attempt to parse the cleaned string
   try {
     let result = JSON.parse(cleanText);
-    
+
     // Log the results to the Apps Script execution log
     // Logger.log("Road Access Available: " + result.RoadAvailable);
     // Logger.log("Surveyor Reasoning: " + result.Analysis_Intersection);
-    
-    return result; 
-    
+
+    return result;
+
   } catch (e) {
     Logger.log("Failed to parse the model's response as valid JSON.");
     Logger.log("Error details: " + e.message);
     Logger.log("Raw text was: " + responseText);
-    
+
     // Fallback error object
     return {
       "RoadAvailable": "ERROR",
@@ -1161,9 +1192,6 @@ function callOpenRouter2(imageLink, prompt) {
     "Content-Type": "application/json"
   };
 
-  // "model": "meta-llama/llama-3.2-90b-vision-instruct",
-
-
   var payload = {
     "model": "google/gemini-2.5-flash",
     "messages": [
@@ -1223,7 +1251,7 @@ function alcornPush() {
 
 function alcornGeoJsonPush() {
 
-  resp = geoJsonPush('alcornGeoJsonBucket', 20);
+  resp = geoJsonPush('alcornGeoJsonBucket', 30);
 
 }
 
