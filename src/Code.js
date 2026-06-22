@@ -2,11 +2,9 @@ function onOpen() {
   // var ui = SpreadsheetApp.getUi();
   const ss = SpreadsheetApp.getActive();
 
- 
-
   const menu = [
 
-    { name: '1A) Push Road and Building Rows to collection (alcornGeoJsonBucket) 30', functionName: 'alcornGeoJsonPush' },
+    { name: '1A) Push Road and Building Rows to collection (alcornGeoJsonBucket) -- 30', functionName: 'alcornGeoJsonPush' },
 
     { name: '1B) Run buildScreenshotsFromLink (runSethApp) with IMAGEAI to generate screenshots ', functionName: 'postToBuildScreenshotsFromLink' },
 
@@ -14,53 +12,25 @@ function onOpen() {
 
     { name: '1D)  Y/N on Available Road using WaterURL with LLM  -- works in parallel', functionName: 'roadAvailableUsingLLM' },
 
+    { name: '1E)  Y/N on StructuresPresent using BuildingURL with LLM  ', functionName: 'structurePresentPrompt' },
+
     { name: '-----------------------------------------------------------------------', functionName: 'dummy' },
-    { name: '2A) Push Road and Building Rows to collection (alcornGeoJsonBucket) 30', functionName: 'alcornGeoJsonPush2' },
-
-    { name: '2B) Run buildScreenshotsFromLink (runSethApp) with IMAGEAI to generate screenshots ', functionName: 'postToBuildScreenshotsFromLink2' },
-
-    { name: '2C) Update PUSHED rows with Road Screenshot Links from collection (alcornGeoJsonBucket)-- wait 30 min', functionName: 'updateWithRoadandBuildingScreenshotPaths2' },
-
-    { name: '2D)  Y/N on Available Road using WaterURL with LLM  -- works in parallel', functionName: 'roadAvailableUsingLLM2' },
-
-    { name: '------------------------------------------------------------------', functionName: 'dummy2' },
-
 
 
     { name: '1) Push to Named Bucket (up to 50), for home access-then run with IMAGEAI to generate screenshots', functionName: 'alcornPush' },
-    , { name: '2) Run sethProp (runSethApp) with IMAGEAI to generate screenshots --api updated', functionName: 'postToSethProp' },
+
+    { name: '2) Run sethProp (runSethApp) with IMAGEAI to generate screenshots --api updated', functionName: 'postToSethProp' },
 
     { name: '3) Update selected rows with Screenshot Links from Named Mongo bucket (alcornBucket) ', functionName: 'updateWithScreenshotPaths' }
   ]
 
   ss.addMenu('Extended', menu);
 
- const menu2 = [
-
-    { name: '1A) Push Road and Building Rows to collection (alcornGeoJsonBucket) 30', functionName: 'alcornGeoJsonPush' },
-
-    { name: '1B) Run buildScreenshotsFromLink (runSethApp) with IMAGEAI to generate screenshots ', functionName: 'postToBuildScreenshotsFromLink' },
-
-    { name: '1C) Update PUSHED rows with Road Screenshot Links from collection (alcornGeoJsonBucket)-- wait 30 min', functionName: 'updateWithRoadandBuildingScreenshotPaths' },
-
-    { name: '1D)  Y/N on Available Road using WaterURL with LLM  -- works in parallel', functionName: 'roadAvailableUsingLLM' },
-
-    { name: '-----------------------------------------------------------------------', functionName: 'dummy' },
-
-    
-
-    // { name: '4A) GeoJSONio url builder from collection', functionName: 'GeoJSONioUrlBuilder' },
-
-
-
-
+  const menu2 = [
 
     { name: '5) Auto Process Screenshot Links with LLM3 -- works in parallel', functionName: 'autoToLLM3' },
     { name: '6) Calculate Points in multiple Rows', functionName: 'getPointsInMultipleRows' },
     { name: '7) Auto Process Screenshot Links for Frontage -- works in parallel', functionName: 'getFrontageWithLLM' },
-
-
-
 
     { name: '7) Select rows and Run STR Calculation (Please switch to the STR sheet)', functionName: 'STR' },
 
@@ -70,8 +40,6 @@ function onOpen() {
     { name: 'Distance to Closest Walmart', functionName: 'getWallmartDistance' },
 
     // { name: '-----------------------------------------------------------------------', functionName: 'dummy' },
-
-
 
     { name: 'Load Planning/Zoning data', functionName: 'loadPZ' },
     { name: 'Initial Planning/Zoning review request (email county PZ office)', functionName: 'initialMessagePZ' },
@@ -164,6 +132,169 @@ function parseSurveyorResponse(responseText) {
     };
   }
 }
+
+function structurePresentPrompt() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const sheetName = sheet.getName();
+  if (!sheetName == "Sheet1") {
+    SpreadsheetApp.getActiveSpreadsheet().toast(
+      "Switch to an sheet1.",
+      "promptStage1",
+      5,
+    );
+    return;
+  }
+  const x = StructuresPresentPromptStage1("StructuresPresent", "Sheet1", "openRouterPrompt2");
+
+}
+
+function StructuresPresentPromptStage1(responseColumnName, sheetName, netlifyFunctionName) {
+  Logger.log(sheetName);
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+
+  const currentSheetObjArr = sheet2Json(sheet);
+  Logger.log("first 2 ");
+  Logger.log(currentSheetObjArr[0]);
+  Logger.log(currentSheetObjArr[1]);
+
+  // Filter rows that haven't been processed yet (no RoadAvailable prompt? Wait, adjust filter as needed)
+  // Assuming you want rows where GeneratedAnswer is empty
+  const toProcess = currentSheetObjArr.filter((row) => {
+    return (
+      row.BuildingURL.includes("http") &&
+      row[responseColumnName] == ""
+    );
+  });
+
+  Logger.log(`Rows to process: ${toProcess.length}`);
+
+  // Process first 10 (or all if you prefer)
+  const firstXPushedRows = toProcess.slice(0, 10);
+
+  if (firstXPushedRows.length === 0) {
+    Logger.log("No new rows to process.");
+    return;
+  }
+
+  // add BuildingURL to rowObj.screenshotURL so openRouterPrompt2 netlify function will
+  // work
+      const prompt = `Act as an expert land surveyor and GIS analyst specializing in parcel structure assessment and city/town planning.
+
+      Your task: Determine whether any houses, buildings, or structures are present entirely inside the highlighted lot polygon on the provided map screenshot.
+
+      Step 1: Identify the exact highlighted lot.
+      Find the primary highlighted lot. It is defined by a distinct, solid dark outline enclosing a shaded polygon. Crucially, the inside of the lot is much darker than the outside surrounding areas. Pay strict attention to its precise, irregular shape. Only this darker, filled area inside the exact outline represents the lot.
+
+      Step 2: Identify all structures visible on the map.
+      Structures on these maps represent constructed, architectural volumes (houses, sheds, commercial buildings). 
+      They appear as:
+      - Distinct building footprint polygons with rigid, man-made geometry (often rectangular, L-shaped, or closely clustered small shapes).
+      - Filled features with a solid fill color distinct from the background terrain.
+
+      Do NOT count the following as structures:
+      - The border or outline of the highlighted parcel itself.
+      - Topographic lines, roads, linear features, text labels, or map UI/watermarks.
+
+      Step 3: Determine whether structures are ENTIRELY INSIDE the shaded lot.
+      Check whether any confirmed building footprint is explicitly and completely located within the darker shaded/filled area of the highlighted polygon.
+      - CRITICAL RULE: DO NOT use a "bounding box" or generalized encompassing rectangle to evaluate the lot. You must strictly follow the irregular, jagged trace of the polygon's solid outline, relying on the contrast between the dark interior and light exterior.
+      - FULL ENCLOSURE REQUIRED: The structure must be 100% inside the parcel. If a structure only partially overlaps the boundary line, sits half-in/half-out, or merely touches the edge, it does NOT count.
+      - If a structure is located inside a lighter, unshaded "notch", "cut-out", or "bay" of the polygon's shape, it is OUTSIDE the lot.
+      - Even if a structure is laterally surrounded by the parcel's outer extremities, if it sits on the lighter background rather than the darker shaded territory of the polygon, it does NOT count.
+
+      Step 4: Output format.
+      Return ONLY a raw valid JSON object.
+      Do not include markdown, code fences, comments, or any text outside the JSON.
+
+      Use exactly this schema and value types:
+
+      {
+        "lot_found": "YES",
+        "StructuresPresent": "YES",
+        "structures": [],
+        "notes": "Short plain-English sentence describing the finding."
+      }
+
+      Rules for the JSON:
+      - "lot_found" must be "YES" if the darker, highlighted parcel is identified, otherwise "NO".
+      - "StructuresPresent" must be "YES" if any valid structure is entirely contained within the darker shaded polygon area, otherwise "NO" (e.g., if structures only exist in the lighter outside areas, are only partially overlapping the line, or are in unshaded cut-outs, return "NO").
+      - "structures" must always be an array.
+      - If no structures are completely inside the shaded lot, use an empty array: [].
+      - If structures are present, keep each structure description short and standard.
+      - "notes" must be a short, plain-English sentence describing the finding.
+      - If the lot cannot be identified, return:
+      {
+        "lot_found": "NO",
+        "StructuresPresent": "NO",
+        "structures": [],
+        "notes": "Highlighted parcel could not be identified."
+      }`;
+
+  let updatedRows = [];
+  for (let i = 0; i < firstXPushedRows.length; i++) {
+    const myRow = firstXPushedRows[i];
+    myRow.screenshotURL = myRow.BuildingURL;
+    myRow.PROMPT = prompt;
+    updatedRows.push(myRow);
+  }
+
+  Logger.log(JSON.stringify(updatedRows));
+
+  const url = APIURL + netlifyFunctionName;
+  Logger.log(url);
+
+  var options = {
+    method: "post",
+    contentType: "application/json",
+    payload: JSON.stringify({
+      myrows: updatedRows,
+      model: "set in netlify",
+    }),
+    muteHttpExceptions: true,
+  };
+
+  Logger.log("payload");
+  Logger.log(
+    JSON.stringify({
+      myrows: updatedRows,
+      model: "set in netlify",
+    }),
+  );
+
+  let responseObj;
+
+  try {
+    const response = UrlFetchApp.fetch(url, options);
+    const httpCode = response.getResponseCode();
+    const body = response.getContentText();
+    Logger.log(httpCode);
+    Logger.log(body);
+    responseObj = parseSurveyorResponse(body);
+  } catch (error) {
+    Logger.log(error);
+  }
+
+  Logger.log("HERE:");
+
+  Logger.log(responseObj);
+
+  for (let i = 0; i < responseObj.length; i++) {
+    try {
+      const myRow = responseObj[i];
+      const jsonString = myRow.GeneratedResponse;
+      const parsed = parseSurveyorResponse(jsonString);
+
+      let YN = parsed[responseColumnName] || "";
+      // let YN = parsed["buildable"] || "";
+
+      var C = updateCell(sheet, myRow, responseColumnName, YN);
+    } catch (e) {
+      Logger.log(`Error processing row ${i}: ${e}`);
+      var C = updateCell(sheet, myRow, responseColumnName, "ERROR");
+    }
+  }
+}
+
 
 function postToSethProp() {
 
@@ -1254,6 +1385,93 @@ function alcornGeoJsonPush() {
   resp = geoJsonPush('alcornGeoJsonBucket', 30);
 
 }
+
+function updateNamedBucket(collection, numberToPush) {
+
+  // - NOTE TO SEND TO netlify update Bucket function it must be an array with a property_id 
+
+  // const payload = getMultipleSelectedRowObjectsDiscontinuous();
+  // const payload = getMultipleSelectedRowObjects();
+  // const payload = getSelectedRowObject();
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  // const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet2');
+
+
+
+  const currentSheetObjArr = sheet2Json(sheet);
+  Logger.log("length: " + currentSheetObjArr.length);
+
+
+  const payload = currentSheetObjArr.filter(x => {
+    if (x.ContourURL == "" || x.WaterURL == "") { return x }
+
+  })
+  let firstFiftyPushedRows = payload.slice(0, numberToPush);// get first 50 or less
+
+
+  // Updated payload: Wrap the array and collection name in an object
+  var options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify({
+      data: firstFiftyPushedRows,  // The array of objects
+      collectionName: collection  // The collection name as a string
+    }),
+    muteHttpExceptions: true
+  };
+
+
+  Logger.log(firstFiftyPushedRows);
+  Logger.log(typeof (firstFiftyPushedRows))
+
+  // const url = 'https://www.postb.in/1739670263592-0602835712488';
+  let url = 'https://nimble-dieffenbachia-92e8e2.netlify.app/.netlify/functions/updateNamedBucket';
+
+  Logger.log(url);
+
+
+  Logger.log(options);
+
+
+  try {
+    // Make the API request
+    const response = UrlFetchApp.fetch(url, options);
+
+    // Parse the JSON response if it is JSON
+    var result = JSON.parse(response.getContentText());
+
+    // Log the result
+
+    const myRows = result.message;
+    Logger.log(myRows);
+    for (var i = 0; i < myRows.length; i++) {
+
+      const myRow = myRows[i];
+      var AN = updateCell(sheet, myRow, 'ContourURL', "PUSHED");
+      var AE = updateCell(sheet, myRow, 'WaterURL', "PUSHED");
+
+
+    }
+
+
+    // const APN = result.message.APN;
+    // const APN2 = result.message.APN2;
+    // const GEOM = result.message.GEOM;
+
+    // var AN = updateCell(sheet, myRow, 'APN', APN);
+    // var AE = updateCell(sheet, myRow, 'APN2', APN2);
+    // var AP = updateCell(sheet, myRow, 'GEOM', GEOM);
+
+  } catch (error) {
+    // Log any errors
+    Logger.log(error);
+  }
+
+}
+
+
+
 
 
 function pushToNamedBucket(collection, numberToPush) {
