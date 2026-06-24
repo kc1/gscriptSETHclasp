@@ -3,94 +3,186 @@ function onOpen() {
   const ss = SpreadsheetApp.getActive();
 
   const menu = [
+    {
+      name: "1A) Push Road and Building Rows to collection (alcornGeoJsonBucket) -- 30",
+      functionName: "alcornGeoJsonPush",
+    },
 
-    { name: '1A) Push Road and Building Rows to collection (alcornGeoJsonBucket) -- 30', functionName: 'alcornGeoJsonPush' },
+    {
+      name: "1B) Run buildScreenshotsFromLink (runSethApp) with IMAGEAI to generate screenshots ",
+      functionName: "postToBuildScreenshotsFromLink",
+    },
 
-    { name: '1B) Run buildScreenshotsFromLink (runSethApp) with IMAGEAI to generate screenshots ', functionName: 'postToBuildScreenshotsFromLink' },
+    {
+      name: "1C) Update PUSHED rows with Road Screenshot Links from collection (alcornGeoJsonBucket)-- wait 30 min",
+      functionName: "updateWithRoadandBuildingScreenshotPaths",
+    },
 
-    { name: '1C) Update PUSHED rows with Road Screenshot Links from collection (alcornGeoJsonBucket)-- wait 30 min', functionName: 'updateWithRoadandBuildingScreenshotPaths' },
+    {
+      name: "1D)  Y/N on Available Road using WaterURL with LLM  -- works in parallel",
+      functionName: "roadAvailableUsingLLM",
+    },
 
-    { name: '1D)  Y/N on Available Road using WaterURL with LLM  -- works in parallel', functionName: 'roadAvailableUsingLLM' },
+    {
+      name: "1E)  Y/N on StructuresPresent using BuildingURL with LLM  ",
+      functionName: "structurePresentPrompt",
+    },
 
-    { name: '1E)  Y/N on StructuresPresent using BuildingURL with LLM  ', functionName: 'structurePresentPrompt' },
+    {
+      name: "-----------------------------------------------------------------------",
+      functionName: "dummy",
+    },
 
-    { name: '-----------------------------------------------------------------------', functionName: 'dummy' },
+    {
+      name: "1) Push to Named Bucket (up to 50), for home access-then run with IMAGEAI to generate screenshots",
+      functionName: "alcornPush",
+    },
 
+    {
+      name: "2) Run sethProp (runSethApp) with IMAGEAI to generate screenshots --api updated",
+      functionName: "postToSethProp",
+    },
 
-    { name: '1) Push to Named Bucket (up to 50), for home access-then run with IMAGEAI to generate screenshots', functionName: 'alcornPush' },
+    {
+      name: "3) Update selected rows with Screenshot Links from Named Mongo bucket (alcornBucket) ",
+      functionName: "updateWithScreenshotPaths",
+    },
+  ];
 
-    { name: '2) Run sethProp (runSethApp) with IMAGEAI to generate screenshots --api updated', functionName: 'postToSethProp' },
-
-    { name: '3) Update selected rows with Screenshot Links from Named Mongo bucket (alcornBucket) ', functionName: 'updateWithScreenshotPaths' }
-  ]
-
-  ss.addMenu('Extended', menu);
+  ss.addMenu("Extended", menu);
 
   const menu2 = [
+    {
+      name: "5) Auto Process Screenshot Links with LLM3 -- works in parallel",
+      functionName: "autoToLLM3",
+    },
+    {
+      name: "6) Calculate Points in multiple Rows",
+      functionName: "getPointsInMultipleRows",
+    },
+    {
+      name: "7) Auto Process Screenshot Links for Frontage -- works in parallel",
+      functionName: "getFrontageWithLLM",
+    },
 
-    { name: '5) Auto Process Screenshot Links with LLM3 -- works in parallel', functionName: 'autoToLLM3' },
-    { name: '6) Calculate Points in multiple Rows', functionName: 'getPointsInMultipleRows' },
-    { name: '7) Auto Process Screenshot Links for Frontage -- works in parallel', functionName: 'getFrontageWithLLM' },
+    {
+      name: "7) Select rows and Run STR Calculation (Please switch to the STR sheet)",
+      functionName: "STR",
+    },
 
-    { name: '7) Select rows and Run STR Calculation (Please switch to the STR sheet)', functionName: 'STR' },
+    {
+      name: "8) Get Single or Multiple APNs and WKTs - api updated",
+      functionName: "getAPNS",
+    },
 
-    { name: '8) Get Single or Multiple APNs and WKTs - api updated', functionName: 'getAPNS' },
-
-    { name: '10) If its still interesting Send Row to Pipeline', functionName: 'toPipeline' },
-    { name: 'Distance to Closest Walmart', functionName: 'getWallmartDistance' },
+    {
+      name: "10) If its still interesting Send Row to Pipeline",
+      functionName: "toPipeline",
+    },
+    {
+      name: "Distance to Closest Walmart",
+      functionName: "getWallmartDistance",
+    },
 
     // { name: '-----------------------------------------------------------------------', functionName: 'dummy' },
 
-    { name: 'Load Planning/Zoning data', functionName: 'loadPZ' },
-    { name: 'Initial Planning/Zoning review request (email county PZ office)', functionName: 'initialMessagePZ' },
-    { name: 'Create KML file in Drive - then upload to GEOJSON.IO for map creation', functionName: 'buildKML' },
-    { name: 'Modify Colours and titles of geojson file (copy geojson.io data into A10)', functionName: 'markupGeojson' },
+    { name: "Load Planning/Zoning data", functionName: "loadPZ" },
+    {
+      name: "Initial Planning/Zoning review request (email county PZ office)",
+      functionName: "initialMessagePZ",
+    },
+    {
+      name: "Create KML file in Drive - then upload to GEOJSON.IO for map creation",
+      functionName: "buildKML",
+    },
+    {
+      name: "Modify Colours and titles of geojson file (copy geojson.io data into A10)",
+      functionName: "markupGeojson",
+    },
 
-    { name: 'Create a Planning/Zoning map review request message in Message field (for email only) - Need to have kml file ready for review', functionName: 'createMessagePZ' },
+    {
+      name: "Create a Planning/Zoning map review request message in Message field (for email only) - Need to have kml file ready for review",
+      functionName: "createMessagePZ",
+    },
 
-    { name: 'Select Row and send PZ department an email', functionName: 'sendEmailToPZFromRow' },
+    {
+      name: "Select Row and send PZ department an email",
+      functionName: "sendEmailToPZFromRow",
+    },
     // { name: '-----------------------------------------------------------------', functionName: 'dummy' }
-
-  ]
+  ];
 
   const menu3 = [
-    { name: 'Add Agent to Follow Up', functionName: 'followAgent' },
+    { name: "Add Agent to Follow Up", functionName: "followAgent" },
 
-    { name: 'Update Remote Mongo Atlas DB from Land.com', functionName: 'updateDBNewLandcomWi' },
-    { name: 'GET LAND.COM - wisconsin properties', functionName: 'getNewLandcomWi' },
-    { name: 'Create Realtor Message', functionName: 'RealMessage' },
+    {
+      name: "Update Remote Mongo Atlas DB from Land.com",
+      functionName: "updateDBNewLandcomWi",
+    },
+    {
+      name: "GET LAND.COM - wisconsin properties",
+      functionName: "getNewLandcomWi",
+    },
+    { name: "Create Realtor Message", functionName: "RealMessage" },
 
     // { name: 'Build Google Earth URL', functionName: 'buildGearthURL' },
     // { name: 'Create Wetland mapper URL', functionName: 'WetlandUrlBuilder' },
     // { name: 'FEMA FLOODplane mapper URL', functionName: 'addFloodPlainLink' },
-    { name: 'Build BB from Polygon', functionName: 'buildBB' },
+    { name: "Build BB from Polygon", functionName: "buildBB" },
     // { name: 'Build url to download DEM geotiff from TNM', functionName: 'createTnmUrl' },
     // { name: 'Import Datatree Property Json', functionName: 'importJsonToSheet' },
     // { name: 'Import Land.com Property Json', functionName: 'importJsonFromDoc' },
     // { name: 'Backup GEO', functionName: 'getGEO' },
-    { name: 'Get Agent Data', functionName: 'getAgent' },
-    { name: 'Set todays OUTREACH contacts to PENDING (9-10 daily)', functionName: 'setTodaysContactsToPending' },
-    { name: 'Get todays PENDING and email (10-11 daily)', functionName: 'SendTodaysOutreachEmails' },
-    { name: 'Extract Utilities from Detail Page', functionName: 'extractUtilities' },
-
+    { name: "Get Agent Data", functionName: "getAgent" },
+    {
+      name: "Set todays OUTREACH contacts to PENDING (9-10 daily)",
+      functionName: "setTodaysContactsToPending",
+    },
+    {
+      name: "Get todays PENDING and email (10-11 daily)",
+      functionName: "SendTodaysOutreachEmails",
+    },
+    {
+      name: "Extract Utilities from Detail Page",
+      functionName: "extractUtilities",
+    },
   ];
   // ss.addMenu('RESEARCH', menu2);
-  ss.addMenu('Extras', menu3);
-
-
+  ss.addMenu("Extras", menu3);
 }
 
-const APIURL = "https://nimble-dieffenbachia-92e8e2.netlify.app/.netlify/functions/";
-
+const APIURL =
+  "https://nimble-dieffenbachia-92e8e2.netlify.app/.netlify/functions/";
 
 function tester() {
   startup();
-  Utilities.sleep(210 * 1000)
+  Utilities.sleep(210 * 1000);
   getNewWIProps();
 }
 
-function dummy() { }
-function dummy2() { }
+function testColorRows() {
+  colorRowsLightBlue([3, 7, 15, 22, 35, 50]);   // ← Put your row numbers here
+}
+
+function colorRowsLightBlue(rowNumbers) {
+  if (!rowNumbers || !Array.isArray(rowNumbers) || rowNumbers.length === 0) return;
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const lastColumn = sheet.getLastColumn();
+  const lightBlue = "#4285f4";
+
+  // Remove duplicates and sort
+  const uniqueRows = [...new Set(rowNumbers)]
+    .filter(r => Number.isInteger(r) && r >= 1)
+    .sort((a, b) => a - b);
+
+  uniqueRows.forEach(row => {
+    sheet.getRange(row, 1, 1, lastColumn).setBackground(lightBlue);
+  });
+}
+
+function dummy() {}
+function dummy2() {}
 /**
  * Safely parses the JSON response from your Vision AI prompt.
  * Strips out any Markdown text formatting first.
@@ -105,8 +197,8 @@ function parseSurveyorResponse(responseText) {
   // 2. Use a Regular Expression to strip Markdown code blocks
   // This removes ```json or ``` at the start, and ``` at the end.
   cleanText = cleanText
-    .replace(/^["']*\s*```(?:json)?/i, '')
-    .replace(/\s*["']*```$/i, '')
+    .replace(/^["']*\s*```(?:json)?/i, "")
+    .replace(/\s*["']*```$/i, "")
     .trim();
   // 3. Attempt to parse the cleaned string
   try {
@@ -117,7 +209,6 @@ function parseSurveyorResponse(responseText) {
     // Logger.log("Surveyor Reasoning: " + result.Analysis_Intersection);
 
     return result;
-
   } catch (e) {
     Logger.log("Failed to parse the model's response as valid JSON.");
     Logger.log("Error details: " + e.message);
@@ -125,10 +216,10 @@ function parseSurveyorResponse(responseText) {
 
     // Fallback error object
     return {
-      "RoadAvailable": "ERROR",
-      "Analysis_LotFound": "Error parsing JSON",
-      "Analysis_RoadsSeen": "N/A",
-      "Analysis_Intersection": "Failed to parse API output: " + cleanText
+      RoadAvailable: "ERROR",
+      Analysis_LotFound: "Error parsing JSON",
+      Analysis_RoadsSeen: "N/A",
+      Analysis_Intersection: "Failed to parse API output: " + cleanText,
     };
   }
 }
@@ -144,11 +235,18 @@ function structurePresentPrompt() {
     );
     return;
   }
-  const x = StructuresPresentPromptStage1("StructuresPresent", "Sheet1", "openRouterPrompt2");
-
+  const x = StructuresPresentPromptStage1(
+    "StructuresPresent",
+    "Sheet1",
+    "openRouterPrompt2",
+  );
 }
 
-function StructuresPresentPromptStage1(responseColumnName, sheetName, netlifyFunctionName) {
+function StructuresPresentPromptStage1(
+  responseColumnName,
+  sheetName,
+  netlifyFunctionName,
+) {
   Logger.log(sheetName);
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
 
@@ -160,10 +258,7 @@ function StructuresPresentPromptStage1(responseColumnName, sheetName, netlifyFun
   // Filter rows that haven't been processed yet (no RoadAvailable prompt? Wait, adjust filter as needed)
   // Assuming you want rows where GeneratedAnswer is empty
   const toProcess = currentSheetObjArr.filter((row) => {
-    return (
-      row.BuildingURL.includes("http") &&
-      row[responseColumnName] == ""
-    );
+    return row.BuildingURL.includes("http") && row[responseColumnName] == "";
   });
 
   Logger.log(`Rows to process: ${toProcess.length}`);
@@ -178,7 +273,7 @@ function StructuresPresentPromptStage1(responseColumnName, sheetName, netlifyFun
 
   // add BuildingURL to rowObj.screenshotURL so openRouterPrompt2 netlify function will
   // work
-      const prompt = `Act as an expert land surveyor and GIS analyst specializing in parcel structure assessment and city/town planning.
+  const prompt = `Act as an expert land surveyor and GIS analyst specializing in parcel structure assessment and city/town planning.
 
       Your task: Determine whether any houses, buildings, or structures are present entirely inside the highlighted lot polygon on the provided map screenshot.
 
@@ -295,26 +390,24 @@ function StructuresPresentPromptStage1(responseColumnName, sheetName, netlifyFun
   }
 }
 
-
 function postToSethProp() {
-
   // if this stops working -- update certificate.
 
-  var url = 'https://image1.space/sethProp';
+  var url = "https://image1.space/sethProp";
 
   var payload = {
     num: 30,
-    filterObj: {}
+    filterObj: {},
   };
 
   var options = {
-    method: 'post',
-    contentType: 'application/json',
+    method: "post",
+    contentType: "application/json",
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     },
     payload: JSON.stringify(payload),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   };
 
   var response = UrlFetchApp.fetch(url, options);
@@ -323,11 +416,11 @@ function postToSethProp() {
 }
 
 function postToBuildScreenshotsFromLink() {
-  var url = 'https://image1.space/buildScreenshotsFromLink';
+  var url = "https://image1.space/buildScreenshotsFromLink";
 
   var payload = {
     num: 30,
-    filterObj: {}
+    filterObj: {},
   };
 
   // headers: {
@@ -335,10 +428,10 @@ function postToBuildScreenshotsFromLink() {
   //     },
 
   var options = {
-    method: 'post',
-    contentType: 'application/json',
+    method: "post",
+    contentType: "application/json",
     payload: JSON.stringify(payload),
-    muteHttpExceptions: false
+    muteHttpExceptions: false,
   };
 
   var response = UrlFetchApp.fetch(url, options);
@@ -348,12 +441,12 @@ function postToBuildScreenshotsFromLink() {
 
 function markupGeojson() {
   // Sample GeoJSON data (use your own variable)
-  var PIPELINESheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('PIPELINE');
+  var PIPELINESheet =
+    SpreadsheetApp.getActiveSpreadsheet().getSheetByName("PIPELINE");
   PIPELINESheet.getRange("D10").setValue("");
 
   var value = PIPELINESheet.getRange("A10").getValue();
   Logger.log(value);
-
 
   const geojson = JSON.parse(value);
 
@@ -363,15 +456,36 @@ function markupGeojson() {
     s /= 100;
     l /= 100;
     let c = (1 - Math.abs(2 * l - 1)) * s,
-      x = c * (1 - Math.abs((h / 60) % 2 - 1)),
+      x = c * (1 - Math.abs(((h / 60) % 2) - 1)),
       m = l - c / 2;
-    let r = 0, g = 0, b = 0;
-    if (h < 60) { r = c; g = x; b = 0; }
-    else if (h < 120) { r = x; g = c; b = 0; }
-    else if (h < 180) { r = 0; g = c; b = x; }
-    else if (h < 240) { r = 0; g = x; b = c; }
-    else if (h < 300) { r = x; g = 0; b = c; }
-    else { r = c; g = 0; b = x; }
+    let r = 0,
+      g = 0,
+      b = 0;
+    if (h < 60) {
+      r = c;
+      g = x;
+      b = 0;
+    } else if (h < 120) {
+      r = x;
+      g = c;
+      b = 0;
+    } else if (h < 180) {
+      r = 0;
+      g = c;
+      b = x;
+    } else if (h < 240) {
+      r = 0;
+      g = x;
+      b = c;
+    } else if (h < 300) {
+      r = x;
+      g = 0;
+      b = c;
+    } else {
+      r = c;
+      g = 0;
+      b = x;
+    }
     r = Math.round((r + m) * 255);
     g = Math.round((g + m) * 255);
     b = Math.round((b + m) * 255);
@@ -381,7 +495,7 @@ function markupGeojson() {
   // Get RGB color with distinct separation for each lot
   function getColor(idx, total) {
     // Distribute hues evenly, use 65% saturation, 60% lightness for nice colors
-    let hue = (idx * 360 / total) % 360;
+    let hue = ((idx * 360) / total) % 360;
     return hslToRgbString(hue, 65, 60);
   }
 
@@ -390,21 +504,15 @@ function markupGeojson() {
     feature.properties.name = `Lot ${idx}`;
 
     feature.properties.fill = getColor(idx, geojson.features.length);
-
   });
 
-
   PIPELINESheet.getRange("D10").setValue(JSON.stringify(geojson));
-
-
-
 }
-
 
 function returnRecentResponses() {
   // Get received emails from the last 7 days
   const now = new Date();
-  const threeDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+  const threeDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
   // Convert timestamps (milliseconds → seconds)
   const newerThan = Math.floor(threeDaysAgo.getTime() / 1000);
@@ -443,8 +551,6 @@ function returnRecentResponses() {
     const date = latestMessage.getDate();
 
     if (!from.includes("google.com")) {
-
-
       // Create a single file content with all thread information
       let fileContent = `Subject: ${subject}\n`;
       fileContent += `From: ${from}\n`;
@@ -472,10 +578,10 @@ function returnRecentResponses() {
         date: date,
         threadId: thread.getId(),
         fileContent: fileContent,
-        processedAt: new Date()
+        processedAt: new Date(),
       };
 
-      Logger.log('response obj ' + i);
+      Logger.log("response obj " + i);
       Logger.log(responseObj);
 
       emailResponses.push(responseObj);
@@ -484,19 +590,23 @@ function returnRecentResponses() {
 
   Logger.log(emailResponses);
 
-  return emailResponses
-
-
+  return emailResponses;
 }
 
 function getSignature() {
-
-
-  return "<div>" +
-    "<div>" + "Dan Nir" + "</div>" +
-    "<div>" + "The Open Land company" + "</div>" +
-    "<div>" + "508-296-5085" + "</div>" +
-    "</div>";
+  return (
+    "<div>" +
+    "<div>" +
+    "Dan Nir" +
+    "</div>" +
+    "<div>" +
+    "The Open Land company" +
+    "</div>" +
+    "<div>" +
+    "508-296-5085" +
+    "</div>" +
+    "</div>"
+  );
 
   // MailApp.sendEmail({
   //   to: "recipient@example.com",
@@ -506,35 +616,25 @@ function getSignature() {
   // });
 }
 
-
 function loadPZ() {
-
   const myRow = getSelectedRowObject();
-  var COUNTYSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('COUNTY INFO');
+  var COUNTYSheet =
+    SpreadsheetApp.getActiveSpreadsheet().getSheetByName("COUNTY INFO");
 
-
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
   const countySheetObjArr = sheet2Json(COUNTYSheet);
   // Logger.log("length: " + currentSheetObjArr.length);
   const county = myRow.county;
-  const countyRowArr = countySheetObjArr.filter(row => row.COUNTY == county)
+  const countyRowArr = countySheetObjArr.filter((row) => row.COUNTY == county);
   const countyRow = countyRowArr.pop();
   Logger.log(countyRow);
   const pzObj = JSON.parse(countyRow.ZONINGDEPT);
   // PlanZoneName	PlanZoneEmail
-  updateCell(sheet, myRow, 'PlanZoneName', pzObj.title + " " + pzObj.ln);
-  updateCell(sheet, myRow, 'PlanZoneEmail', pzObj.email);
-
-
+  updateCell(sheet, myRow, "PlanZoneName", pzObj.title + " " + pzObj.ln);
+  updateCell(sheet, myRow, "PlanZoneEmail", pzObj.email);
 }
 
-
-
-
-
-
 function calculatePointsInRow(roadJson, contourJson, waterJson) {
-
   Logger.log("RR");
   Logger.log(roadJson);
   // CRobj = JSON.parse(CR);
@@ -543,7 +643,6 @@ function calculatePointsInRow(roadJson, contourJson, waterJson) {
   roadJson = roadJson.replace(/'/g, '"');
   contourJson = contourJson.replace(/'/g, '"');
   waterJson = waterJson.replace(/'/g, '"');
-
 
   const RR = JSON.parse(roadJson); // {'roadNumberInteger': 2}
   const CR = JSON.parse(contourJson); //{estimated percentage of lot that is hilly: 10, estimated percentage of lot that is flat: 90}
@@ -567,14 +666,14 @@ function calculatePointsInRow(roadJson, contourJson, waterJson) {
       // optionally handle other cases
       break;
   }
-  flatLand = Number(CR["estimated percentage of lot that is flat"]) / 100 * 20;
-  waterValue = (100 - Number(WR["total estimated percentage"])) / 100 * 50;
+  flatLand =
+    (Number(CR["estimated percentage of lot that is flat"]) / 100) * 20;
+  waterValue = ((100 - Number(WR["total estimated percentage"])) / 100) * 50;
 
   // Logger.log("CR");
   // Logger.log(CR);
   // CRobj = JSON.parse(CR);
   // Logger.log(CRobj);
-
 
   Logger.log("roadNumberInteger");
   Logger.log(roadNumberInteger);
@@ -588,27 +687,26 @@ function calculatePointsInRow(roadJson, contourJson, waterJson) {
   return roadNumberInteger + flatLand + waterValue;
 }
 
-
 function getScreenshotPaths() {
-
   // const payload = getMultipleSelectedRowObjects();
   const payload = getMultipleSelectedRowObjectsDiscontinuous();
 
   // const payload = getSelectedRowObject();
 
   Logger.log(payload);
-  Logger.log(typeof (payload))
+  Logger.log(typeof payload);
 
-  Logger.log(JSON.stringify(payload))
+  Logger.log(JSON.stringify(payload));
   Logger.log("-------------------------");
 
-  const url = "https://comfy-crisp-d74946.netlify.app/.netlify/functions/getDropboxLinks";
+  const url =
+    "https://comfy-crisp-d74946.netlify.app/.netlify/functions/getDropboxLinks";
 
   var options = {
-    method: 'post',
-    contentType: 'application/json',
+    method: "post",
+    contentType: "application/json",
     payload: JSON.stringify(payload),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   };
 
   try {
@@ -619,103 +717,92 @@ function getScreenshotPaths() {
     const responseObjArr = JSON.parse(response.getContentText());
 
     // Log the result
-    Logger.log('out');
+    Logger.log("out");
     Logger.log(responseObjArr);
-    const bucket_listing_ids = responseObjArr.map(x => x.listing_id);
+    const bucket_listing_ids = responseObjArr.map((x) => x.listing_id);
 
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+    const sheet =
+      SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
     const currentSheetObjArr = sheet2Json(sheet);
     Logger.log("length: " + currentSheetObjArr.length);
 
-
     // for (var i = 0; i < currentSheetObjArr.length; i++) { //right now its > 2000 - I'll scan first 300 properties
-    for (var i = 0; i < 300; i++) { //right now its > 2000 - I'll scan first 300 properties
+    for (var i = 0; i < 300; i++) {
+      //right now its > 2000 - I'll scan first 300 properties
       const myRow = currentSheetObjArr[i];
 
       // const currentSheetObjArr = objArr[i];
       if (bucket_listing_ids.includes(myRow.listing_id)) {
-
-        let filtered = responseObjArr.filter(row => row.listing_id === myRow.listing_id);
+        let filtered = responseObjArr.filter(
+          (row) => row.listing_id === myRow.listing_id,
+        );
         Logger.log(filtered);
 
         const filteredRow = filtered.pop();
 
-        var waterFile = filteredRow.WaterURL
-        var contourFile = filteredRow.ContourURL
+        var waterFile = filteredRow.WaterURL;
+        var contourFile = filteredRow.ContourURL;
 
         Logger.log("Water File: " + waterFile);
         Logger.log("Contour File: " + contourFile);
 
         // var C = updateCell(sheet, myRow, 'ContourURL', contourFile);
-        var C = addNote2(sheet, myRow, 'ContourURL', contourFile);
+        var C = addNote2(sheet, myRow, "ContourURL", contourFile);
 
-        var W = addNote2(sheet, myRow, 'WaterURL', waterFile);
+        var W = addNote2(sheet, myRow, "WaterURL", waterFile);
         // var C = addNote2(sheet, myRow, column, text);
-
       } else {
+        var C = addNote2(sheet, myRow, "ContourURL", "REPUSH!");
 
-        var C = addNote2(sheet, myRow, 'ContourURL', "REPUSH!");
-
-        var W = addNote2(sheet, myRow, 'WaterURL', "Return to STEP 4");
+        var W = addNote2(sheet, myRow, "WaterURL", "Return to STEP 4");
       }
     }
-
   } catch (error) {
     // Log any errors
     Logger.log(error);
   }
-
-
 }
 
 function updateWithScreenshotPaths() {
-
   autoUpdateWithScreenshotPaths("alcornBucket", 20);
-
 }
 
 function updateWithRoadandBuildingScreenshotPaths() {
-
   const isPushed = (x) => {
     return x.RoadURL === "PUSHED" || x.BuildingURL === "PUSHED";
   };
   baseUpdateWithScreenshotPaths("alcornGeoJsonBucket", 20, isPushed);
-
 }
 
 function updateWithBuildingScreenshotPaths() {
-
   const isPushed = (x) => x.RoadURL === "PUSHED";
   baseUpdateWithScreenshotPaths("alcornGeoJsonBucket", 20, isPushed);
-
 }
 
 function autoUpdateWithScreenshotPaths(collectionName, numberToPull) {
-
   // const responseObjArr = getMultipleSelectedRowObjects();
   // const responseObjArr = getMultipleSelectedRowObjectsDiscontinuous();
   // const payload = getSelectedRowObject();
 
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
   let currentSheetObjArr = sheet2Json(sheet);
   Logger.log("length: " + currentSheetObjArr.length);
 
+  const pushedRows = currentSheetObjArr.filter((x) => {
+    if (x.ContourURL == "PUSHED" || x.WaterURL == "PUSHED") {
+      return x;
+    }
+  });
 
-  const pushedRows = currentSheetObjArr.filter(x => {
-    if (x.ContourURL == "PUSHED" || x.WaterURL == "PUSHED") { return x }
+  let firstFiftyPushedRows = pushedRows.slice(0, numberToPull); // get first 50 or less
 
-  })
-
-  let firstFiftyPushedRows = pushedRows.slice(0, numberToPull);// get first 50 or less
-
-  Logger.log('out');
-  const IDS = firstFiftyPushedRows.map(x => x.ID);
+  Logger.log("out");
+  const IDS = firstFiftyPushedRows.map((x) => x.ID);
   Logger.log(IDS);
-
 
   const filterObj = { ID: { $in: IDS } };
 
-  const myJSON = fetchMongoDBDataAPI(filterObj, collectionName)
+  const myJSON = fetchMongoDBDataAPI(filterObj, collectionName);
 
   Logger.log(myJSON);
   const myObjects = JSON.parse(myJSON);
@@ -724,48 +811,48 @@ function autoUpdateWithScreenshotPaths(collectionName, numberToPull) {
   let rowUploadedToBucketFlag = true; // STEP 4
   let rowUpdatedWithLinksFlag = true; // STEP 5
 
-
-  for (var i = 0; i < firstFiftyPushedRows.length; i++) { //right now its > 2000 - I'll scan first 300 properties
+  for (var i = 0; i < firstFiftyPushedRows.length; i++) {
+    //right now its > 2000 - I'll scan first 300 properties
     // for (var i = 0; i < 300; i++) { //right now its > 2000 - I'll scan first 300 properties
     const myRow = firstFiftyPushedRows[i];
 
     // const currentSheetObjArr = objArr[i];
     // if (listing_ids.includes(myRow.listing_id)) {
 
-    let filteredRecords = mongoRecords.filter(mongoRow => mongoRow.ID === myRow.ID);
+    let filteredRecords = mongoRecords.filter(
+      (mongoRow) => mongoRow.ID === myRow.ID,
+    );
     Logger.log(filteredRecords);
 
     if (filteredRecords.length) {
-
       const filteredRecord = filteredRecords.pop(); // get the first , likely only record.
 
-      var waterFile = filteredRecord?.WaterURL
-      var contourFile = filteredRecord?.ContourURL
+      var waterFile = filteredRecord?.WaterURL;
+      var contourFile = filteredRecord?.ContourURL;
 
-      if (waterFile.startsWith("http") || contourFile.startsWith("http")) { // ie UPDATED step 5.
+      if (waterFile.startsWith("http") || contourFile.startsWith("http")) {
+        // ie UPDATED step 5.
 
         // Logger.log("Water File: " + waterFile);
         // Logger.log("Contour File: " + contourFile);
 
         // var C = updateCell(sheet, myRow, 'ContourURL', contourFile);
         if (contourFile) {
-          var C = updateCell(sheet, myRow, 'ContourURL', contourFile);
+          var C = updateCell(sheet, myRow, "ContourURL", contourFile);
         }
         if (waterFile) {
-          var W = updateCell(sheet, myRow, 'WaterURL', waterFile);
+          var W = updateCell(sheet, myRow, "WaterURL", waterFile);
         } else {
-          var C = updateCell(sheet, myRow, 'ContourURL', "");
-          var W = updateCell(sheet, myRow, 'WaterURL', "");
+          var C = updateCell(sheet, myRow, "ContourURL", "");
+          var W = updateCell(sheet, myRow, "WaterURL", "");
           rowUpdatedWithLinksFlag = false;
         }
       }
     } else {
-      var C = updateCell(sheet, myRow, 'ContourURL', "");
-      var W = updateCell(sheet, myRow, 'WaterURL', "");
+      var C = updateCell(sheet, myRow, "ContourURL", "");
+      var W = updateCell(sheet, myRow, "WaterURL", "");
       rowUploadedToBucketFlag = false;
     }
-
-
   }
   if (!rowUploadedToBucketFlag) {
     SpreadsheetApp.getUi().alert("You may need to rerun step 4!");
@@ -775,31 +862,30 @@ function autoUpdateWithScreenshotPaths(collectionName, numberToPull) {
   }
 }
 
-
-
-function baseUpdateWithScreenshotPaths(collectionName, numberToPull, filterFunction) {
-
+function baseUpdateWithScreenshotPaths(
+  collectionName,
+  numberToPull,
+  filterFunction,
+) {
   // const responseObjArr = getMultipleSelectedRowObjects();
   // const responseObjArr = getMultipleSelectedRowObjectsDiscontinuous();
   // const payload = getSelectedRowObject();
 
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
   let currentSheetObjArr = sheet2Json(sheet);
   Logger.log("length: " + currentSheetObjArr.length);
 
-
   const pushedRows = currentSheetObjArr.filter(filterFunction);
 
-  let firstXPushedRows = pushedRows.slice(0, numberToPull);// get first 50 or less
+  let firstXPushedRows = pushedRows.slice(0, numberToPull); // get first 50 or less
 
-  Logger.log('out');
-  const IDS = firstXPushedRows.map(x => x.ID);
+  Logger.log("out");
+  const IDS = firstXPushedRows.map((x) => x.ID);
   Logger.log(IDS);
-
 
   const filterObj = { ID: { $in: IDS } };
 
-  const myJSON = fetchMongoDBDataAPI(filterObj, collectionName)
+  const myJSON = fetchMongoDBDataAPI(filterObj, collectionName);
 
   Logger.log(myJSON);
   const myObjects = JSON.parse(myJSON);
@@ -808,48 +894,44 @@ function baseUpdateWithScreenshotPaths(collectionName, numberToPull, filterFunct
   let rowUploadedToBucketFlag = true; // STEP 4
   let rowUpdatedWithLinksFlag = true; // STEP 5
 
-
-  for (var i = 0; i < firstXPushedRows.length; i++) { //right now its > 2000 - I'll scan first 300 properties
+  for (var i = 0; i < firstXPushedRows.length; i++) {
+    //right now its > 2000 - I'll scan first 300 properties
     // for (var i = 0; i < 300; i++) { //right now its > 2000 - I'll scan first 300 properties
     const myRow = firstXPushedRows[i];
 
     // const currentSheetObjArr = objArr[i];
     // if (listing_ids.includes(myRow.listing_id)) {
 
-    let filteredRecords = mongoRecords.filter(mongoRow => mongoRow.ID === myRow.ID);
+    let filteredRecords = mongoRecords.filter(
+      (mongoRow) => mongoRow.ID === myRow.ID,
+    );
     Logger.log(filteredRecords);
 
     if (filteredRecords.length) {
-
       const filteredRecord = filteredRecords.pop(); // get the first , likely only record.
 
-      var roadFile = filteredRecord?.RoadURL
-      var buildingFile = filteredRecord?.BuildingURL
+      var roadFile = filteredRecord?.RoadURL;
+      var buildingFile = filteredRecord?.BuildingURL;
 
-      if (roadFile.startsWith("http")) { // ie UPDATED step 5.
-        var C = updateCell(sheet, myRow, 'RoadURL', roadFile);
+      if (roadFile.startsWith("http")) {
+        // ie UPDATED step 5.
+        var C = updateCell(sheet, myRow, "RoadURL", roadFile);
+      } else {
+        var C = updateCell(sheet, myRow, "RoadURL", "");
       }
-      else {
-        var C = updateCell(sheet, myRow, 'RoadURL', "");
-      }
-      if (buildingFile.startsWith("http")) { // ie UPDATED step 5.
-        var C = updateCell(sheet, myRow, 'BuildingURL', buildingFile);
-      }
-      else {
-        var C = updateCell(sheet, myRow, 'BuildingURL', "");
+      if (buildingFile.startsWith("http")) {
+        // ie UPDATED step 5.
+        var C = updateCell(sheet, myRow, "BuildingURL", buildingFile);
+      } else {
+        var C = updateCell(sheet, myRow, "BuildingURL", "");
       }
     }
-
   }
-
 }
-
-
 
 // function addNote2(text = "", column = "NOTES") {
 
 function getNote2(row, column) {
-
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
 
   // const myRow = getSelectedRowObject();
@@ -859,7 +941,7 @@ function getNote2(row, column) {
   // var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
 
   // Get the sheet by name
-  var sheet = spreadsheet.getSheetByName('Sheet1');
+  var sheet = spreadsheet.getSheetByName("Sheet1");
 
   // Get the specific cell (e.g., A1)
   var cell = sheet.getRange(cr);
@@ -869,10 +951,7 @@ function getNote2(row, column) {
   return currentNote;
 }
 
-
 function addNote2(sheet, row, column, text) {
-
-
   // const myRow = getSelectedRowObject();
   const cr = getRowCellRangeByColumnName(row, column);
   console.log(cr);
@@ -896,12 +975,9 @@ function addNote2(sheet, row, column, text) {
 
   // Update the cell with the new note
   cell.setNote(text);
-
 }
 
 function prependNote2(sheet, row, column, text) {
-
-
   // const myRow = getSelectedRowObject();
   const cr = getRowCellRangeByColumnName(row, column);
   console.log(cr);
@@ -925,10 +1001,7 @@ function prependNote2(sheet, row, column, text) {
 
   // Update the cell with the new note
   cell.setNote(updatedNote);
-
 }
-
-
 
 function autoToLLM3() {
   // Get selected rows
@@ -938,37 +1011,62 @@ function autoToLLM3() {
   // const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
   // const currentSheetObjArr = sheet2Json(sheet);
 
-
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
   let currentSheetObjArr = sheet2Json(sheet);
   Logger.log("length: " + currentSheetObjArr.length);
 
   // let firstTen = currentSheetObjArr.slice(0, 10);// get first 10 or less
 
+  const pushedRows = currentSheetObjArr.filter((x) => {
+    if (
+      x.ContourURL.includes("dropbox") &&
+      x.WaterURL.includes("dropbox") &&
+      (x.ContourResponse == "" ||
+        x.WaterResponse == "" ||
+        x.RoadResponse == "" ||
+        x.ContourResponse == "{}" ||
+        x.WaterResponse == "{}" ||
+        x.RoadResponse == "{}")
+    ) {
+      return x;
+    }
+  });
 
+  const filteredRows = pushedRows.filter((x) => {
+    return (
+      x.ID &&
+      x.ContourURL &&
+      x.WaterURL &&
+      x.ContourResponse &&
+      x.WaterResponse &&
+      x.RoadResponse &&
+      x.POINTS
+    );
+  });
 
-  const pushedRows = currentSheetObjArr.filter(x => {
-    if ((x.ContourURL.includes("dropbox") && x.WaterURL.includes("dropbox")) && (x.ContourResponse == "" || x.WaterResponse == "" || x.RoadResponse == "" || x.ContourResponse == "{}" || x.WaterResponse == "{}" || x.RoadResponse == "{}")) { return x }
-  })
-
-  const filteredRows = pushedRows.filter(x => { return x.ID && x.ContourURL && x.WaterURL && x.ContourResponse && x.WaterResponse && x.RoadResponse && x.POINTS });
-
-  let firstTenPushedRows = pushedRows.slice(0, 15);// get first 10 or less
+  let firstTenPushedRows = pushedRows.slice(0, 15); // get first 10 or less
 
   Logger.log(JSON.stringify(firstTenPushedRows));
 
-  const keepKeys = ['ID', 'ContourURL', 'WaterURL', 'ContourResponse', 'WaterResponse', 'RoadResponse', 'POINTS'];
+  const keepKeys = [
+    "ID",
+    "ContourURL",
+    "WaterURL",
+    "ContourResponse",
+    "WaterResponse",
+    "RoadResponse",
+    "POINTS",
+  ];
 
-  const limitedRows = firstTenPushedRows.map(row =>
+  const limitedRows = firstTenPushedRows.map((row) =>
     Object.fromEntries(
-      Object.entries(row).filter(([key]) => keepKeys.includes(key))
-    )
+      Object.entries(row).filter(([key]) => keepKeys.includes(key)),
+    ),
   );
 
   Logger.log(JSON.stringify(limitedRows));
 
-
-  let url = APIURL + 'openRouter';
+  let url = APIURL + "openRouter";
 
   Logger.log(JSON.stringify(firstTenPushedRows));
 
@@ -977,17 +1075,15 @@ function autoToLLM3() {
   Logger.log(url);
 
   var options = {
-    method: 'post',
-    contentType: 'application/json',
+    method: "post",
+    contentType: "application/json",
     payload: JSON.stringify(firstTenPushedRows),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   };
 
+  Logger.log("payload");
 
-  Logger.log('payload');
-
-  Logger.log(JSON.stringify(options))
-
+  Logger.log(JSON.stringify(options));
 
   try {
     // Make the API request
@@ -1002,9 +1098,7 @@ function autoToLLM3() {
 
     const filteredRows = JSON.parse(result.results);
 
-
     for (var i = 0; i < filteredRows.length; i++) {
-
       const myRow = filteredRows[i];
 
       // const APN = result.message.APN;
@@ -1018,27 +1112,28 @@ function autoToLLM3() {
       let WaterResponse = myRow.WaterResponse;
       let RoadResponse = myRow.RoadResponse;
 
-      let rContourResponse = ContourResponse.split('').reverse().join('');
-      let rWaterResponse = WaterResponse.split('').reverse().join('');
-      let rRoadResponse = RoadResponse.split('').reverse().join('');
+      let rContourResponse = ContourResponse.split("").reverse().join("");
+      let rWaterResponse = WaterResponse.split("").reverse().join("");
+      let rRoadResponse = RoadResponse.split("").reverse().join("");
 
-      rContourResponse = rContourResponse.substr(0, rContourResponse.indexOf("---"));
+      rContourResponse = rContourResponse.substr(
+        0,
+        rContourResponse.indexOf("---"),
+      );
       rWaterResponse = rWaterResponse.substr(0, rWaterResponse.indexOf("---"));
       rRoadResponse = rRoadResponse.substr(0, rRoadResponse.indexOf("---"));
 
-      ContourResponse = rContourResponse.split('').reverse().join('');
-      WaterResponse = rWaterResponse.split('').reverse().join('');
-      RoadResponse = rRoadResponse.split('').reverse().join('');
+      ContourResponse = rContourResponse.split("").reverse().join("");
+      WaterResponse = rWaterResponse.split("").reverse().join("");
+      RoadResponse = rRoadResponse.split("").reverse().join("");
 
       Logger.log(ContourResponse);
       Logger.log(WaterResponse);
       Logger.log(RoadResponse);
 
-
       let contourJson = "{" + extractSubstring(ContourResponse, "{", "}") + "}";
       let waterJson = "{" + extractSubstring(WaterResponse, "{", "}") + "}";
       let roadJson = "{" + extractSubstring(RoadResponse, "{", "}") + "}";
-
 
       Logger.log(contourJson);
       Logger.log(waterJson);
@@ -1046,53 +1141,43 @@ function autoToLLM3() {
 
       // const points = calculatePointsInRow(roadJson, contourJson, waterJson)
 
-
       if (contourJson.length > 10) {
-        var C = updateCell(sheet, myRow, 'ContourResponse', contourJson);
+        var C = updateCell(sheet, myRow, "ContourResponse", contourJson);
       }
       if (waterJson.length > 10) {
-        var W = updateCell(sheet, myRow, 'WaterResponse', waterJson);
+        var W = updateCell(sheet, myRow, "WaterResponse", waterJson);
       }
       if (roadJson.length > 10) {
-        var Y = updateCell(sheet, myRow, 'RoadResponse', roadJson);
+        var Y = updateCell(sheet, myRow, "RoadResponse", roadJson);
       }
       // var Z = updateCell(sheet, myRow, 'POINTS', points);
-
-
     }
-
   } catch (error) {
     // Log any errors
     Logger.log("Error: " + error.toString());
   }
-
-
 }
 
 function getPointsInMultipleRows() {
-
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
   let currentSheetObjArr = sheet2Json(sheet);
   Logger.log("length: " + currentSheetObjArr.length);
 
-
-  const pushedRows = currentSheetObjArr.filter(x =>
-    typeof x.ContourResponse === 'string' &&
-    typeof x.WaterResponse === 'string' &&
-    typeof x.RoadResponse === 'string' &&
-    x.ContourResponse.length > 2 &&
-    x.WaterResponse.length > 2 &&
-    x.RoadResponse.length > 2 &&
-    typeof x.POINTS !== 'number'
+  const pushedRows = currentSheetObjArr.filter(
+    (x) =>
+      typeof x.ContourResponse === "string" &&
+      typeof x.WaterResponse === "string" &&
+      typeof x.RoadResponse === "string" &&
+      x.ContourResponse.length > 2 &&
+      x.WaterResponse.length > 2 &&
+      x.RoadResponse.length > 2 &&
+      typeof x.POINTS !== "number",
   );
 
-  let firstTenPushedRows = pushedRows.slice(0, 50);// get first 10 or less
+  let firstTenPushedRows = pushedRows.slice(0, 50); // get first 10 or less
   Logger.log(JSON.stringify(firstTenPushedRows));
 
-
-
   for (var i = 0; i < firstTenPushedRows.length; i++) {
-
     const myRow = firstTenPushedRows[i];
     const contourJson = myRow.ContourResponse;
     const waterJson = myRow.WaterResponse;
@@ -1101,50 +1186,41 @@ function getPointsInMultipleRows() {
     Logger.log(contourJson);
     Logger.log(waterJson);
     Logger.log(roadJson);
-    const points = calculatePointsInRow(roadJson, contourJson, waterJson)
-    var Z = updateCell(sheet, myRow, 'POINTS', points);
-
+    const points = calculatePointsInRow(roadJson, contourJson, waterJson);
+    var Z = updateCell(sheet, myRow, "POINTS", points);
   }
-
-
 }
 
 function roadAvailableUsingLLM() {
-
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
   let currentSheetObjArr = sheet2Json(sheet);
   Logger.log("length: " + currentSheetObjArr.length);
 
-  const pushedRows = currentSheetObjArr.filter(x => {
-    if (x.WaterURL.includes("dropbox") && !String(x.RoadAvailable || "")) { return x }
-  })
+  const pushedRows = currentSheetObjArr.filter((x) => {
+    if (x.WaterURL.includes("dropbox") && !String(x.RoadAvailable || "")) {
+      return x;
+    }
+  });
 
   // x.WaterURL.includes("box") && !String(x.available || "").trim()
 
-
-
-  let firstTenPushedRows = pushedRows.slice(0, 10);// get first 10 or less
+  let firstTenPushedRows = pushedRows.slice(0, 10); // get first 10 or less
 
   Logger.log(JSON.stringify(firstTenPushedRows));
 
-
-
-
-  let url = APIURL + 'openRouterRoadAvailable';
+  let url = APIURL + "openRouterRoadAvailable";
   Logger.log(url);
 
   var options = {
-    method: 'post',
-    contentType: 'application/json',
+    method: "post",
+    contentType: "application/json",
     payload: JSON.stringify(firstTenPushedRows),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   };
 
-
-  Logger.log('payload');
+  Logger.log("payload");
 
   Logger.log(JSON.stringify(options));
-
 
   try {
     // Make the API request
@@ -1158,9 +1234,7 @@ function roadAvailableUsingLLM() {
 
     const filteredRows = JSON.parse(result.results);
 
-
     for (var i = 0; i < filteredRows.length; i++) {
-
       const myRow = filteredRows[i];
       Logger.log(myRow.RoadAvailable);
 
@@ -1173,58 +1247,59 @@ function roadAvailableUsingLLM() {
 
       let Response = myRow.RoadAvailable;
 
-      let rResponse = Response.split('').reverse().join('');
+      let rResponse = Response.split("").reverse().join("");
 
       rResponse = rResponse.substr(0, rResponse.indexOf("---"));
 
-      Response = rResponse.split('').reverse().join('');
+      Response = rResponse.split("").reverse().join("");
 
       Logger.log(Response);
 
-
       let json = "{" + extractSubstring(Response, "{", "}") + "}";
-
 
       Logger.log(json);
 
       const obj = JSON.parse(json);
 
-
       let YN = obj["AvailableRoad"];
 
-
-
-      var C = updateCell(sheet, myRow, 'RoadAvailable', YN);
-
-
+      var C = updateCell(sheet, myRow, "RoadAvailable", YN);
     }
-
   } catch (error) {
     // Log any errors
     Logger.log(error);
   }
-
-
 }
 
 function getFrontageWithLLM() {
-
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
   let currentSheetObjArr = sheet2Json(sheet);
   Logger.log("length: " + currentSheetObjArr.length);
 
-  const pushedRows = currentSheetObjArr.filter(x => {
-    if (x.WaterURL.includes("dropbox") && x.calculatedPerimeterFeet !== "" && x.calcFrontage == "") { return x }
+  const pushedRows = currentSheetObjArr.filter((x) => {
+    if (
+      x.WaterURL.includes("dropbox") &&
+      x.calculatedPerimeterFeet !== "" &&
+      x.calcFrontage == ""
+    ) {
+      return x;
+    }
     // if ( x.calcFrontage == "") { return x }
+  });
 
-  })
-
-  let firstTenPushedRows = pushedRows.slice(0, 10);// get first 10 or less
+  let firstTenPushedRows = pushedRows.slice(0, 10); // get first 10 or less
 
   Logger.log(JSON.stringify(firstTenPushedRows));
 
-  const keepKeys = ['ID', 'ContourURL', 'WaterURL', 'ContourResponse', 'WaterResponse', 'RoadResponse', 'POINTS'];
-
+  const keepKeys = [
+    "ID",
+    "ContourURL",
+    "WaterURL",
+    "ContourResponse",
+    "WaterResponse",
+    "RoadResponse",
+    "POINTS",
+  ];
 
   // const limitedRows = firstTenPushedRows.map(row =>
   //   Object.fromEntries(
@@ -1234,24 +1309,21 @@ function getFrontageWithLLM() {
 
   // Logger.log(JSON.stringify(limitedRows));
 
-
-  let url = APIURL + 'openRouterFrontage';
+  let url = APIURL + "openRouterFrontage";
   // let url ="https://www.postb.in/1775252069951-5364527481142";
   // url = "https://www.postb.in/b/1775252069951-5364527481142";
   Logger.log(url);
 
   var options = {
-    method: 'post',
-    contentType: 'application/json',
+    method: "post",
+    contentType: "application/json",
     payload: JSON.stringify(firstTenPushedRows),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   };
 
-
-  Logger.log('payload');
+  Logger.log("payload");
 
   Logger.log(JSON.stringify(options));
-
 
   try {
     // Make the API request
@@ -1265,9 +1337,7 @@ function getFrontageWithLLM() {
 
     const filteredRows = JSON.parse(result.results);
 
-
     for (var i = 0; i < filteredRows.length; i++) {
-
       const myRow = filteredRows[i];
       Logger.log(myRow.calcFrontage);
 
@@ -1280,75 +1350,69 @@ function getFrontageWithLLM() {
 
       let FrontageResponse = myRow.calcFrontage;
 
-      let rFrontageResponse = FrontageResponse.split('').reverse().join('');
+      let rFrontageResponse = FrontageResponse.split("").reverse().join("");
 
-      rFrontageResponse = rFrontageResponse.substr(0, rFrontageResponse.indexOf("---"));
+      rFrontageResponse = rFrontageResponse.substr(
+        0,
+        rFrontageResponse.indexOf("---"),
+      );
 
-      FrontageResponse = rFrontageResponse.split('').reverse().join('');
+      FrontageResponse = rFrontageResponse.split("").reverse().join("");
 
       Logger.log(FrontageResponse);
 
-
-      let frontageJson = "{" + extractSubstring(FrontageResponse, "{", "}") + "}";
-
+      let frontageJson =
+        "{" + extractSubstring(FrontageResponse, "{", "}") + "}";
 
       Logger.log(frontageJson);
 
       const frontageObj = JSON.parse(frontageJson);
 
-
       frontage = frontageObj["Estimated Road Length in feet"];
 
-
-
-      var C = updateCell(sheet, myRow, 'calcFrontage', frontage);
-
-
+      var C = updateCell(sheet, myRow, "calcFrontage", frontage);
     }
-
   } catch (error) {
     // Log any errors
     Logger.log(error);
   }
-
-
 }
-
 
 function callOpenRouter2(imageLink, prompt) {
   var url = "https://openrouter.ai/api/v1/chat/completions";
 
   var headers = {
-    "Authorization": "Bearer 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",
-    "Content-Type": "application/json"
+    Authorization:
+      "Bearer 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",
+    "Content-Type": "application/json",
   };
 
   var payload = {
-    "model": "google/gemini-2.5-flash",
-    "messages": [
+    model: "google/gemini-2.5-flash",
+    messages: [
       {
-        "role": "user",
-        "content": [
+        role: "user",
+        content: [
           {
-            "type": "text",
-            "text": prompt // No need to manually add quotes
+            type: "text",
+            text: prompt, // No need to manually add quotes
           },
           {
-            "type": "image_url",
-            "image_url": {
-              "url": imageLink // Use the passed parameter
-            }
-          }
-        ]
-      }
-    ]
+            type: "image_url",
+            image_url: {
+              url: imageLink, // Use the passed parameter
+            },
+          },
+        ],
+      },
+    ],
   };
 
   var options = {
     method: "post",
     headers: headers,
     payload: JSON.stringify(payload),
-    muteHttpExceptions: true // Allows handling of non-200 responses
+    muteHttpExceptions: true, // Allows handling of non-200 responses
   };
 
   try {
@@ -1361,78 +1425,69 @@ function callOpenRouter2(imageLink, prompt) {
   }
 }
 
-
 function imageTest() {
-
   const text = "What is in this image?";
   // const imageLink = 'https://www.dropbox.com/scl/fi/b7tfviennf40hgz5c5lrn/wi_Marathon_7830082140992_contours.png?rlkey=plpddg83p82dxcebndlg9xlla&dl=0';
-  const imageLink = 'https://www.dropbox.com/scl/fi/b7tfviennf40hgz5c5lrn/wi_Marathon_7830082140992_contours.png?rlkey=plpddg83p82dxcebndlg9xlla&raw=1';
-
+  const imageLink =
+    "https://www.dropbox.com/scl/fi/b7tfviennf40hgz5c5lrn/wi_Marathon_7830082140992_contours.png?rlkey=plpddg83p82dxcebndlg9xlla&raw=1";
 
   let x = callOpenRouter2(imageLink, text);
-
-
 }
 
 function alcornPush() {
-
-  resp = pushToNamedBucket('alcornBucket', 30);
-
+  resp = pushToNamedBucket("alcornBucket", 30);
 }
 
 function alcornGeoJsonPush() {
-
-  resp = geoJsonPush('alcornGeoJsonBucket', 30);
-
+  resp = geoJsonPush("alcornGeoJsonBucket", 30);
 }
 
 function updateNamedBucket(collection, numberToPush) {
-
-  // - NOTE TO SEND TO netlify update Bucket function it must be an array with a property_id 
+  // - NOTE TO SEND TO netlify update Bucket function it must be an array with a property_id
 
   // const payload = getMultipleSelectedRowObjectsDiscontinuous();
   // const payload = getMultipleSelectedRowObjects();
   // const payload = getSelectedRowObject();
 
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
   // const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet2');
-
-
 
   const currentSheetObjArr = sheet2Json(sheet);
   Logger.log("length: " + currentSheetObjArr.length);
 
-
-  const payload = currentSheetObjArr.filter(x => {
-    if (x.ContourURL == "" || x.WaterURL == "") { return x }
-
-  })
-  let firstFiftyPushedRows = payload.slice(0, numberToPush);// get first 50 or less
-
+  const payload = currentSheetObjArr.filter((x) => {
+    if (
+      x.ContourURL == "" ||
+      x.WaterURL == "" ||
+      x.RoadAvailable.length == 3 || //yes
+      x.StructuresPresent.length == 2  // no
+    ) {
+      return x;
+    }
+  });
+  let firstFiftyPushedRows = payload.slice(0, numberToPush); // get first 50 or less
 
   // Updated payload: Wrap the array and collection name in an object
   var options = {
-    method: 'post',
-    contentType: 'application/json',
+    method: "post",
+    contentType: "application/json",
     payload: JSON.stringify({
-      data: firstFiftyPushedRows,  // The array of objects
-      collectionName: collection  // The collection name as a string
+      data: firstFiftyPushedRows, // The array of objects
+      collectionName: collection, // The collection name as a string
     }),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   };
 
-
   Logger.log(firstFiftyPushedRows);
-  Logger.log(typeof (firstFiftyPushedRows))
+  Logger.log(typeof firstFiftyPushedRows);
 
   // const url = 'https://www.postb.in/1739670263592-0602835712488';
-  let url = 'https://nimble-dieffenbachia-92e8e2.netlify.app/.netlify/functions/updateNamedBucket';
+  let url =
+    "https://nimble-dieffenbachia-92e8e2.netlify.app/.netlify/functions/updateNamedBucket";
 
   Logger.log(url);
 
-
   Logger.log(options);
-
 
   try {
     // Make the API request
@@ -1446,14 +1501,10 @@ function updateNamedBucket(collection, numberToPush) {
     const myRows = result.message;
     Logger.log(myRows);
     for (var i = 0; i < myRows.length; i++) {
-
       const myRow = myRows[i];
-      var AN = updateCell(sheet, myRow, 'ContourURL', "PUSHED");
-      var AE = updateCell(sheet, myRow, 'WaterURL', "PUSHED");
-
-
+      var AN = updateCell(sheet, myRow, "ContourURL", "PUSHED");
+      var AE = updateCell(sheet, myRow, "WaterURL", "PUSHED");
     }
-
 
     // const APN = result.message.APN;
     // const APN2 = result.message.APN2;
@@ -1462,65 +1513,52 @@ function updateNamedBucket(collection, numberToPush) {
     // var AN = updateCell(sheet, myRow, 'APN', APN);
     // var AE = updateCell(sheet, myRow, 'APN2', APN2);
     // var AP = updateCell(sheet, myRow, 'GEOM', GEOM);
-
   } catch (error) {
     // Log any errors
     Logger.log(error);
   }
-
 }
 
-
-
-
-
 function pushToNamedBucket(collection, numberToPush) {
-
-  // - NOTE TO SEND TO netlify update Bucket function it must be an array with a property_id 
+  // - NOTE TO SEND TO netlify update Bucket function it must be an array with a property_id
 
   // const payload = getMultipleSelectedRowObjectsDiscontinuous();
   // const payload = getMultipleSelectedRowObjects();
   // const payload = getSelectedRowObject();
 
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
-  // const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet2');
-
-
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
 
   const currentSheetObjArr = sheet2Json(sheet);
   Logger.log("length: " + currentSheetObjArr.length);
 
-
-  const payload = currentSheetObjArr.filter(x => {
-    if (x.ContourURL == "" || x.WaterURL == "") { return x }
-
-  })
-  let firstFiftyPushedRows = payload.slice(0, numberToPush);// get first 50 or less
-
+  const payload = currentSheetObjArr.filter((x) => {
+    if (x.ContourURL == "" || x.WaterURL == "") {
+      return x;
+    }
+  });
+  let firstFiftyPushedRows = payload.slice(0, numberToPush); // get first 50 or less
 
   // Updated payload: Wrap the array and collection name in an object
   var options = {
-    method: 'post',
-    contentType: 'application/json',
+    method: "post",
+    contentType: "application/json",
     payload: JSON.stringify({
-      data: firstFiftyPushedRows,  // The array of objects
-      collectionName: collection  // The collection name as a string
+      data: firstFiftyPushedRows, // The array of objects
+      collectionName: collection, // The collection name as a string
     }),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   };
 
-
   Logger.log(firstFiftyPushedRows);
-  Logger.log(typeof (firstFiftyPushedRows))
+  Logger.log(typeof firstFiftyPushedRows);
 
   // const url = 'https://www.postb.in/1739670263592-0602835712488';
-  let url = 'https://nimble-dieffenbachia-92e8e2.netlify.app/.netlify/functions/updateNamedBucket';
+  let url =
+    "https://nimble-dieffenbachia-92e8e2.netlify.app/.netlify/functions/updateNamedBucket";
 
   Logger.log(url);
 
-
   Logger.log(options);
-
 
   try {
     // Make the API request
@@ -1534,14 +1572,10 @@ function pushToNamedBucket(collection, numberToPush) {
     const myRows = result.message;
     Logger.log(myRows);
     for (var i = 0; i < myRows.length; i++) {
-
       const myRow = myRows[i];
-      var AN = updateCell(sheet, myRow, 'ContourURL', "PUSHED");
-      var AE = updateCell(sheet, myRow, 'WaterURL', "PUSHED");
-
-
+      var AN = updateCell(sheet, myRow, "ContourURL", "PUSHED");
+      var AE = updateCell(sheet, myRow, "WaterURL", "PUSHED");
     }
-
 
     // const APN = result.message.APN;
     // const APN2 = result.message.APN2;
@@ -1550,67 +1584,59 @@ function pushToNamedBucket(collection, numberToPush) {
     // var AN = updateCell(sheet, myRow, 'APN', APN);
     // var AE = updateCell(sheet, myRow, 'APN2', APN2);
     // var AP = updateCell(sheet, myRow, 'GEOM', GEOM);
-
   } catch (error) {
     // Log any errors
     Logger.log(error);
   }
-
 }
 
 function geoJsonPush(collection, numberToPush) {
-
-  // - NOTE TO SEND TO netlify update Bucket function it must be an array with a property_id 
+  // - NOTE TO SEND TO netlify update Bucket function it must be an array with a property_id
 
   // const payload = getMultipleSelectedRowObjectsDiscontinuous();
   // const payload = getMultipleSelectedRowObjects();
   // const payload = getSelectedRowObject();
 
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
   // const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet2');
-
-
 
   const currentSheetObjArr = sheet2Json(sheet);
   Logger.log("length: " + currentSheetObjArr.length);
 
-
-  const rows = currentSheetObjArr.filter(x => {
-    if (x.RoadURL == "" || x.BuildingURL == "") { return x }
-
-  })
+  const rows = currentSheetObjArr.filter((x) => {
+    if (x.RoadURL == "" || x.BuildingURL == "") {
+      return x;
+    }
+  });
 
   // const miniRows = rows.map(x => ({
   //   PARNO: x.PARNO,
   //   RoadURL: x.RoadURL
   // }));
 
-  let firstXRows = rows.slice(0, numberToPush);// get first 50 or less
-
+  let firstXRows = rows.slice(0, numberToPush); // get first 50 or less
 
   // Updated payload: Wrap the array and collection name in an object
   var options = {
-    method: 'post',
-    contentType: 'application/json',
+    method: "post",
+    contentType: "application/json",
     payload: JSON.stringify({
-      data: firstXRows,  // The array of objects
-      collectionName: collection  // The collection name as a string
+      data: firstXRows, // The array of objects
+      collectionName: collection, // The collection name as a string
     }),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   };
 
-
   Logger.log(firstXRows);
-  Logger.log(typeof (firstXRows))
+  Logger.log(typeof firstXRows);
 
   // const url = 'https://www.postb.in/1739670263592-0602835712488';
-  let url = 'https://nimble-dieffenbachia-92e8e2.netlify.app/.netlify/functions/updateNamedBucket';
+  let url =
+    "https://nimble-dieffenbachia-92e8e2.netlify.app/.netlify/functions/updateNamedBucket";
 
   Logger.log(url);
 
-
   Logger.log(options);
-
 
   try {
     // Make the API request
@@ -1624,14 +1650,10 @@ function geoJsonPush(collection, numberToPush) {
     const myRows = result.message;
     Logger.log(myRows);
     for (var i = 0; i < myRows.length; i++) {
-
       const myRow = myRows[i];
-      var AN = updateCell(sheet, myRow, 'RoadURL', "PUSHED");
-      var AE = updateCell(sheet, myRow, 'BuildingURL', "PUSHED");
-
-
+      var AN = updateCell(sheet, myRow, "RoadURL", "PUSHED");
+      var AE = updateCell(sheet, myRow, "BuildingURL", "PUSHED");
     }
-
 
     // const APN = result.message.APN;
     // const APN2 = result.message.APN2;
@@ -1640,50 +1662,47 @@ function geoJsonPush(collection, numberToPush) {
     // var AN = updateCell(sheet, myRow, 'APN', APN);
     // var AE = updateCell(sheet, myRow, 'APN2', APN2);
     // var AP = updateCell(sheet, myRow, 'GEOM', GEOM);
-
   } catch (error) {
     // Log any errors
     Logger.log(error);
   }
-
 }
 
 function autoPushToBucket() {
-
-  // - NOTE TO SEND TO netlify update Bucket function it must be an array with a property_id 
+  // - NOTE TO SEND TO netlify update Bucket function it must be an array with a property_id
 
   // const payload = getMultipleSelectedRowObjectsDiscontinuous();
   // const payload = getMultipleSelectedRowObjects();
   // const payload = getSelectedRowObject();
 
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
   const currentSheetObjArr = sheet2Json(sheet);
   Logger.log("length: " + currentSheetObjArr.length);
 
-
-  const payload = currentSheetObjArr.filter(x => {
-    if (x.AutoEvaluation == "Y" && (x.ContourURL == "" || x.WaterURL == "")) { return x }
-
-  })
-  let firstFiftyPushedRows = payload.slice(0, 50);// get first 50 or less
+  const payload = currentSheetObjArr.filter((x) => {
+    if (x.AutoEvaluation == "Y" && (x.ContourURL == "" || x.WaterURL == "")) {
+      return x;
+    }
+  });
+  let firstFiftyPushedRows = payload.slice(0, 50); // get first 50 or less
 
   Logger.log(firstFiftyPushedRows);
-  Logger.log(typeof (firstFiftyPushedRows))
+  Logger.log(typeof firstFiftyPushedRows);
 
   // const url = 'https://www.postb.in/1739670263592-0602835712488';
-  let url = 'https://nimble-dieffenbachia-92e8e2.netlify.app/.netlify/functions/updateBucket';
+  let url =
+    "https://nimble-dieffenbachia-92e8e2.netlify.app/.netlify/functions/updateBucket";
 
   Logger.log(url);
 
   var options = {
-    method: 'post',
-    contentType: 'application/json',
+    method: "post",
+    contentType: "application/json",
     payload: JSON.stringify(firstFiftyPushedRows),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   };
 
   Logger.log(options);
-
 
   try {
     // Make the API request
@@ -1697,14 +1716,10 @@ function autoPushToBucket() {
     const myRows = result.message;
     Logger.log(myRows);
     for (var i = 0; i < myRows.length; i++) {
-
       const myRow = myRows[i];
-      var AN = updateCell(sheet, myRow, 'ContourURL', "PUSHED");
-      var AE = updateCell(sheet, myRow, 'WaterURL', "PUSHED");
-
-
+      var AN = updateCell(sheet, myRow, "ContourURL", "PUSHED");
+      var AE = updateCell(sheet, myRow, "WaterURL", "PUSHED");
     }
-
 
     // const APN = result.message.APN;
     // const APN2 = result.message.APN2;
@@ -1713,34 +1728,31 @@ function autoPushToBucket() {
     // var AN = updateCell(sheet, myRow, 'APN', APN);
     // var AE = updateCell(sheet, myRow, 'APN2', APN2);
     // var AP = updateCell(sheet, myRow, 'GEOM', GEOM);
-
   } catch (error) {
     // Log any errors
     Logger.log(error);
   }
-
 }
 
-
-
 function toPipeline() {
-
   const myObj = getSelectedRowObject();
-  var pipelineSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('PIPELINE');
+  var pipelineSheet =
+    SpreadsheetApp.getActiveSpreadsheet().getSheetByName("PIPELINE");
   const o = addRowFromObject(myObj, pipelineSheet);
-
 }
 
 function askOpenRouterAI(email) {
   // Define your API key and other configurations
-  const OPENROUTER_API_KEY = "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";
+  const OPENROUTER_API_KEY =
+    "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";
   // const YOUR_SITE_URL = "your-site-url-here";     // Replace with your site URL
   // const YOUR_SITE_NAME = "your-site-name-here";   // Replace with your site name
 
   // const question = "Can you rewrite the following email: Hi Michael, We talked a while back about https://www.realtor.com/realestateandhomes-detail/Campbell-Rd_Herbster_WI_54844_M92817-42723?from=srp , but someone else ended up buying it. Have you come across any similar properties recently in Bayfield? I'm interested in properties with a mild slope , a small amount of ground water/flood plain and legal road access. I can make an all cash offer and move quickly. Thank you - Dan"
 
-
-  const question = "With the role of a real estate investor, can you rewrite the following email,including the provided url and return the subject and body as json using html syntax: " + email;
+  const question =
+    "With the role of a real estate investor, can you rewrite the following email,including the provided url and return the subject and body as json using html syntax: " +
+    email;
 
   // API endpoint
   const url = "https://openrouter.ai/api/v1/chat/completions";
@@ -1749,17 +1761,17 @@ function askOpenRouterAI(email) {
   const payload = {
     model: "google/learnlm-1.5-pro-experimental:free",
     messages: [
-      { role: "user", content: question } // Dynamically insert user's question
+      { role: "user", content: question }, // Dynamically insert user's question
     ],
     top_p: 1,
     temperature: 1,
-    repetition_penalty: 1
+    repetition_penalty: 1,
   };
 
   // Request headers
   const headers = {
     Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
   };
 
   // Request options
@@ -1767,7 +1779,7 @@ function askOpenRouterAI(email) {
     method: "post",
     headers: headers,
     payload: JSON.stringify(payload),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   };
 
   try {
@@ -1781,9 +1793,9 @@ function askOpenRouterAI(email) {
     Logger.log("Full Response: " + JSON.stringify(jsonResponse));
 
     // Extract and return the AI's response
-    const aiResponse = jsonResponse.choices[0]?.message?.content || "No response received.";
+    const aiResponse =
+      jsonResponse.choices[0]?.message?.content || "No response received.";
     return aiResponse;
-
   } catch (error) {
     // Log and handle errors
     Logger.log("Error: " + error.message);
@@ -1791,40 +1803,39 @@ function askOpenRouterAI(email) {
   }
 }
 
-
 function SendTodaysOutreachEmails() {
-
   // eg 35, 70, 105 days later ...
   // relies only on follow_up_date in Main
 
-  Logger.log(' IN longTermFollowUp');
+  Logger.log(" IN longTermFollowUp");
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const outreachSheet = ss.getSheetByName('Outreach');
+  const outreachSheet = ss.getSheetByName("Outreach");
   var rows = sheet2Json(outreachSheet);
 
   var filteredRows = rows.filter(function (row) {
     return row.NextContact == "PENDING";
   });
 
-  Logger.log(filteredRows)
+  Logger.log(filteredRows);
 
   var today = new Date();
-  var todayString = Utilities.formatDate(today, 'America/New_York', "yyyy-MM-dd");
-
-
+  var todayString = Utilities.formatDate(
+    today,
+    "America/New_York",
+    "yyyy-MM-dd",
+  );
 
   for (var i = 0; i < filteredRows.length; i++) {
-
     const myRow = filteredRows[i];
     const randomBetweenMinus5And5 = Math.random() * 10 - 5;
-    const daysInFuture = 35 + randomBetweenMinus5And5 // 5 weeks +- 5 days
+    const daysInFuture = 35 + randomBetweenMinus5And5; // 5 weeks +- 5 days
     const fd = getFutureDate(daysInFuture);
-    const ContactedOn = myRow.ContactedOn + ',' + todayString;
+    const ContactedOn = myRow.ContactedOn + "," + todayString;
     const Response = askOpenRouterAI(myRow.MESSAGE);
 
     // Extract the JSON content
-    const jsonString = Response.replace(/^```json/, '').replace(/```/, '');
+    const jsonString = Response.replace(/^```json/, "").replace(/```/, "");
 
     Logger.log(jsonString);
 
@@ -1832,24 +1843,20 @@ function SendTodaysOutreachEmails() {
     const jsonObject = JSON.parse(jsonString);
 
     console.log(jsonObject.subject); // Output: Following up on Bayfield Property Search
-    console.log(jsonObject.body);    // Output: The email body
+    console.log(jsonObject.body); // Output: The email body
 
     try {
       MailApp.sendEmail({
         to: myRow.AgentEmail,
-        subject: 'Looking for buildable land',
-        htmlBody: jsonObject.body
+        subject: "Looking for buildable land",
+        htmlBody: jsonObject.body,
       });
-
-    }
-    catch (err) {
+    } catch (err) {
       res = false;
     }
-    var ud = updateCell(outreachSheet, myRow, 'NextContact', fd);
-    var ud = updateCell(outreachSheet, myRow, 'ContactedOn', ContactedOn);
-
+    var ud = updateCell(outreachSheet, myRow, "NextContact", fd);
+    var ud = updateCell(outreachSheet, myRow, "ContactedOn", ContactedOn);
   }
-
 
   // var sendableRows = rows.filter(function (row) {
   //   var rowFollowDate = new Date(row['NEXT_CONTACT'])
@@ -1873,66 +1880,54 @@ function SendTodaysOutreachEmails() {
   // } else {
   //   var u = updateCell(sheet, sendableRow, 'NEXT_CONTACT', 'FAILED');
   // }
-
 }
 
 function followAgent() {
-
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet1 = ss.getSheetByName('Sheet1');
-  const outreachSheet = ss.getSheetByName('Outreach');
+  const sheet1 = ss.getSheetByName("Sheet1");
+  const outreachSheet = ss.getSheetByName("Outreach");
   let myObj = getSelectedRowObject();
-  myObj.FIRST = myObj.AgentName.split(' ')[0];
-  myObj.LAST = myObj.AgentName.split(' ')[1];
+  myObj.FIRST = myObj.AgentName.split(" ")[0];
+  myObj.LAST = myObj.AgentName.split(" ")[1];
 
-  myObj.NextContact = myObj.AgentName.split(' ')[1];
-
+  myObj.NextContact = myObj.AgentName.split(" ")[1];
 
   myObj.MESSAGE = `Hi ${myObj.FIRST}, We talked a while back about ${myObj.AAlink} , but someone else ended up buying it. Have you come across any similar properties recently in ${myObj.county} county? I'm interested in properties with a mild slope , a small amount of ground water/flood plain and legal road access. I can make an all cash offer and move quickly. Thank you - Dan`;
 
   const randomBetweenMinus5And5 = Math.random() * 10 - 5;
 
-  const daysInFuture = 35 + randomBetweenMinus5And5 // 5 weeks +- 5 days
+  const daysInFuture = 35 + randomBetweenMinus5And5; // 5 weeks +- 5 days
 
   myObj.NextContact = getFutureDate(daysInFuture);
 
-
-
   const o = addRowFromObject(myObj, outreachSheet);
 
-  //  COUNTY	AgentName	FIRST	LAST	LINK	AgentPhone	AgentEmail	MESSAGE	SPUNMESSAGE	ContactedOn	DayInterval	NextContact																			
-
-
-
+  //  COUNTY	AgentName	FIRST	LAST	LINK	AgentPhone	AgentEmail	MESSAGE	SPUNMESSAGE	ContactedOn	DayInterval	NextContact
 }
 
 function setTodaysContactsToPending() {
-
-  var main_rows = jsonRowsFromSheet('OUTREACH')
-  Logger.log(main_rows)
+  var main_rows = jsonRowsFromSheet("OUTREACH");
+  Logger.log(main_rows);
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const outreachSheet = ss.getSheetByName('Outreach');
-
+  const outreachSheet = ss.getSheetByName("Outreach");
 
   let today = new Date();
   today.setHours(0, 0, 0, 0); // Set time to midnight to compare only the date part
 
   var filteredRows = main_rows.filter(function (row) {
-    var date_time = new Date(row['NextContact']); // Convert to Date object
+    var date_time = new Date(row["NextContact"]); // Convert to Date object
     date_time.setHours(0, 0, 0, 0); // Set time to midnight
 
     return date_time.getTime() === today.getTime(); // Compare timestamps
   });
 
-  Logger.log(filteredRows)
+  Logger.log(filteredRows);
 
   for (var i = 0; i < filteredRows.length; i++) {
     const myRow = filteredRows[i];
-    var ud = updateCell(outreachSheet, myRow, 'NextContact', "PENDING");
+    var ud = updateCell(outreachSheet, myRow, "NextContact", "PENDING");
   }
-
 }
-
 
 function extractZipCode(url) {
   var regex = /WI_(\d{5})_/;
@@ -1943,10 +1938,6 @@ function extractZipCode(url) {
     return null; // No match found
   }
 }
-
-
-
-
 
 function createFemaUrl(lat, lon) {
   var baseUrl = "https://msc.fema.gov/portal/search?AddressQuery=";
@@ -1970,15 +1961,12 @@ function addFloodPlainLink() {
 
   const clickable = shortenUrl(longUrl);
 
-
-  var ud = updateCell(sheet, myRow, 'FLOODPLAIN', clickable);
+  var ud = updateCell(sheet, myRow, "FLOODPLAIN", clickable);
 }
 
-
 function importJSONFromData(jsonObj) {
-
   // Replace 'Sheet1' with the name of the sheet you want to populate.
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
 
   // Clear existing data (optional).
   sheet.clear();
@@ -1997,25 +1985,24 @@ function importJSONFromData(jsonObj) {
   }
 }
 
-
-
 function cosineDistanceBetweenPoints(lat1, lon1, lat2, lon2) {
   const R = 6371e3;
-  const p1 = lat1 * Math.PI / 180;
-  const p2 = lat2 * Math.PI / 180;
+  const p1 = (lat1 * Math.PI) / 180;
+  const p2 = (lat2 * Math.PI) / 180;
   const deltaP = p2 - p1;
   const deltaLon = lon2 - lon1;
   const deltaLambda = (deltaLon * Math.PI) / 180;
-  const a = Math.sin(deltaP / 2) * Math.sin(deltaP / 2) +
-    Math.cos(p1) * Math.cos(p2) *
-    Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+  const a =
+    Math.sin(deltaP / 2) * Math.sin(deltaP / 2) +
+    Math.cos(p1) *
+      Math.cos(p2) *
+      Math.sin(deltaLambda / 2) *
+      Math.sin(deltaLambda / 2);
   const d = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * R;
   return d;
 }
 
-
 function fetchMongoDBDataAPI(filterObj, coll) {
-
   //  1GxuC9AAuc77xJklnS1PSHVKhZUt3QkcOaqdSYRqoeQVrSnf8jtGtLO3zGlNfm4T -- this is the api auth token and cannot be retrieved
 
   // NOTE - to get the connection string for remote mongo goto realio .env
@@ -2026,13 +2013,13 @@ function fetchMongoDBDataAPI(filterObj, coll) {
 
   var headers = {
     "Content-Type": "application/json",
-    "Access-Control-Request-Headers": "*"
+    "Access-Control-Request-Headers": "*",
   };
 
   var payload = {
     filterObj: filterObj,
-    coll: coll
-  }
+    coll: coll,
+  };
 
   Logger.log("payload: ");
   Logger.log(JSON.stringify(payload));
@@ -2041,11 +2028,10 @@ function fetchMongoDBDataAPI(filterObj, coll) {
     method: "post",
     headers: headers,
     payload: JSON.stringify(payload),
-    muteHttpExceptions: false
+    muteHttpExceptions: false,
   };
 
   // const query = { list_date: { $gte: dt }, state: st };
-
 
   var response = UrlFetchApp.fetch(url, options);
 
@@ -2066,7 +2052,6 @@ function fetchMongoDBDataAPI(filterObj, coll) {
 }
 
 function treatData(data) {
-
   // let treatedArr = [];
   // for (let index = 0; index < objArr.length; index++) {
   // const obj = objArr[index];
@@ -2084,20 +2069,16 @@ function treatData(data) {
   // }
 
   return treated;
-
 }
 
 function proj4() {
-
-
-  const libraryUrl = "https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.3/proj4.min.js";
+  const libraryUrl =
+    "https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.3/proj4.min.js";
   const proj4 = eval(UrlFetchApp.fetch(libraryUrl).getContentText());
   proj4();
-
 }
 
 function WetlandUrlBuilder() {
-
   var selection = SpreadsheetApp.getSelection();
   var activerow = selection.getCurrentCell().getRow();
   var sheet = SpreadsheetApp.getActiveSheet();
@@ -2109,19 +2090,21 @@ function WetlandUrlBuilder() {
   Logger.log(myRow.lon + ", " + myRow.lat);
   const longUrl = constructGeocodeURL(myRow.lat, myRow.lon);
   const respJson = UrlFetchApp.fetch(longUrl);
-  const finalUrl = constructMapServerURL(respJson)
+  const finalUrl = constructMapServerURL(respJson);
   Logger.log(finalUrl);
 
   const clickable = shortenUrl(finalUrl);
 
-
-  var ud = updateCell(sheet, myRow, 'WETLAND', clickable);
-  var ud1 = updateCell(sheet, myRow, 'WETLANDcoords', myRow.lon + ", " + myRow.lat);
-
+  var ud = updateCell(sheet, myRow, "WETLAND", clickable);
+  var ud1 = updateCell(
+    sheet,
+    myRow,
+    "WETLANDcoords",
+    myRow.lon + ", " + myRow.lat,
+  );
 }
 
 function buildGearthURL() {
-
   var selection = SpreadsheetApp.getSelection();
   var activerow = selection.getCurrentCell().getRow();
   var sheet = SpreadsheetApp.getActiveSheet();
@@ -2132,9 +2115,9 @@ function buildGearthURL() {
   const wkt = myRow.GEOM;
 
   Logger.log(listing_id);
-  const fileName = listing_id + ".kml"
+  const fileName = listing_id + ".kml";
 
-  const kmlString = loadFileContents(fileName)
+  const kmlString = loadFileContents(fileName);
 
   const base64encoded = encodeKml(kmlString);
   const encoded = encodeURIComponent(base64encoded);
@@ -2146,23 +2129,27 @@ function buildGearthURL() {
   const center = getCenterPointFromBoundingBox(bb);
   console.log(center);
 
-  const base = (lat, lon) => `https://earth.google.com/web/@${lat},${lon},183.18378053a,1000.03477904d,30y,0h,0t,0r/data=`
+  const base = (lat, lon) =>
+    `https://earth.google.com/web/@${lat},${lon},183.18378053a,1000.03477904d,30y,0h,0t,0r/data=`;
   const baseString = base(center[0], center[1]);
   const longUrl = `${baseString}${encoded}`;
   console.log(longUrl);
 
   const clickable = shortenUrl(longUrl);
 
-
-  var ud = updateCell(sheet, myRow, 'gEARTHurl', longUrl);
-
-
+  var ud = updateCell(sheet, myRow, "gEARTHurl", longUrl);
 }
 
 // please note its  acres: { $gte: minAcreage, $lte: maxAcreage } in land.com
 
-
-function geoQuery(lon, lat, radiusInMiles, minAcreage, maxAcreage, daysBack = 183) {
+function geoQuery(
+  lon,
+  lat,
+  radiusInMiles,
+  minAcreage,
+  maxAcreage,
+  daysBack = 183,
+) {
   const metersinmile = 1609.34;
 
   // Calculate the cutoff date
@@ -2173,24 +2160,25 @@ function geoQuery(lon, lat, radiusInMiles, minAcreage, maxAcreage, daysBack = 18
     location: {
       $nearSphere: {
         $geometry: { type: "Point", coordinates: [lon, lat] },
-        $maxDistance: radiusInMiles * metersinmile // Convert radius from miles to meters
-      }
+        $maxDistance: radiusInMiles * metersinmile, // Convert radius from miles to meters
+      },
     },
     // Filter out documents with invalid location fields
     "location.coordinates": { $type: "array", $size: 2 }, // Ensure coordinates array has exactly 2 elements
     "location.coordinates.0": { $type: "number", $ne: null }, // Ensure longitude is a valid number
     "location.coordinates.1": { $type: "number", $ne: null }, // Ensure latitude is a valid number
     lot_acres: { $gte: minAcreage, $lte: maxAcreage },
-    sold_date: { $gte: cutoffDate.toISOString() } // Ensure sold_date is within 'daysBack' days from today
+    sold_date: { $gte: cutoffDate.toISOString() }, // Ensure sold_date is within 'daysBack' days from today
   };
 }
 
-
 function getWallmartDistance() {
-
   const myRow = getSelectedRowObject();
 
-  if (!myRow.lon || !myRow.lat) { throw new Error("Missing lat/long in index property."); return; }
+  if (!myRow.lon || !myRow.lat) {
+    throw new Error("Missing lat/long in index property.");
+    return;
+  }
 
   // Logger.log(myRow);
   // Logger.log(" comps : ");
@@ -2204,19 +2192,16 @@ function getWallmartDistance() {
       $near: {
         $geometry: {
           type: "Point",
-          coordinates: [Number(myRow.lon), Number(myRow.lat)]
+          coordinates: [Number(myRow.lon), Number(myRow.lat)],
         },
-        $maxDistance: 100000 // optional max distance in meters
-      }
-    }
-  }
-
+        $maxDistance: 100000, // optional max distance in meters
+      },
+    },
+  };
 
   // function cosineDistanceBetweenPoints(lat1, lon1, lat2, lon2) {
 
-
   console.log(JSON.stringify(myQuery));
-
 
   const myJSON = fetchMongoDBDataAPI(myQuery, "Walmart");
   Logger.log(myJSON);
@@ -2224,58 +2209,56 @@ function getWallmartDistance() {
   let walmarts = myObjects.documents;
   for (var i = 0; i < walmarts.length; i++) {
     const walmart = walmarts[i];
-    const distance = cosineDistanceBetweenPoints(Number(myRow.lat), Number(myRow.lon), Number(walmart.latitude), Number(walmart.longitude));
+    const distance = cosineDistanceBetweenPoints(
+      Number(myRow.lat),
+      Number(myRow.lon),
+      Number(walmart.latitude),
+      Number(walmart.longitude),
+    );
     walmarts[i].distance = distance;
   }
   Logger.log(walmarts);
 
   const closestMetres = walmarts[0].distance;
-  const closestMiles = closestMetres / 1000 * 0.621371;
+  const closestMiles = (closestMetres / 1000) * 0.621371;
   var sheet = SpreadsheetApp.getActiveSheet();
-  var ud = updateCell(sheet, myRow, 'to Walmart(<20)', closestMiles);
-
-
+  var ud = updateCell(sheet, myRow, "to Walmart(<20)", closestMiles);
 }
-
-
-
-
-
 
 function getLastFrozenRowHeaders() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getActiveSheet();
   var lastFrozenRow = sheet.getFrozenRows();
   // var lastFrozenRow = freezeRange[-1];
-  var lastFrozenRowHeaders = sheet.getRange(lastFrozenRow, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var lastFrozenRowHeaders = sheet
+    .getRange(lastFrozenRow, 1, 1, sheet.getLastColumn())
+    .getValues()[0];
   return lastFrozenRowHeaders;
 }
 
 function getLastFrozenRowHeadersBySheet(sheet) {
-
   var lastFrozenRow = sheet.getFrozenRows();
   // var lastFrozenRow = freezeRange[-1];
-  var lastFrozenRowHeaders = sheet.getRange(lastFrozenRow, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var lastFrozenRowHeaders = sheet
+    .getRange(lastFrozenRow, 1, 1, sheet.getLastColumn())
+    .getValues()[0];
   return lastFrozenRowHeaders;
 }
 
-
-
-
-
 function createMessage(type) {
-
   var sheet = SpreadsheetApp.getActiveSheet();
 
   const myRow = getSelectedRowObject();
   var myText;
   var column;
   if (type == "R") {
-
     myText = `${myRow.AgentPhone} Hi, I'm interested in more information about the property in ${myRow.AAlink}. Can you send me the county property number/APN? It looks like there is a road, but is there legal access, power and water? Thank you - Dan`;
     column = "Message";
   } else if (type == "PZ") {
-    if (!myRow.MYMAPSHARE || !myRow.PlanZoneName) { throw new Error("Missing PlanZoneName or MYMAPSHARE."); return; }
+    if (!myRow.MYMAPSHARE || !myRow.PlanZoneName) {
+      throw new Error("Missing PlanZoneName or MYMAPSHARE.");
+      return;
+    }
 
     myText = `<p>${myRow.PlanZoneName},</p> 
     
@@ -2284,7 +2267,10 @@ function createMessage(type) {
     <p>Based on my reading of the ${myRow.county} county subdivision docs , I believe the following would be an acceptable minor subdivision : ${myRow.MYMAPSHARE} ? Would you mind taking a look at this map and letting me know what you think , as the expert.</p> <p>Thank you,</p>`;
     column = "PlanZoneMessage";
   } else if (type == "IPZ") {
-    if (!myRow.MYMAPSHARE || !myRow.PlanZoneName) { throw new Error("Missing PlanZoneName or MYMAPSHARE."); return; }
+    if (!myRow.MYMAPSHARE || !myRow.PlanZoneName) {
+      throw new Error("Missing PlanZoneName or MYMAPSHARE.");
+      return;
+    }
 
     myText = `<p>Hi ${myRow.PlanZoneName},</p>
     
@@ -2292,29 +2278,20 @@ function createMessage(type) {
      
      <p>Thank you,</p>`;
     column = "PlanZoneMessage";
-
   } else if (type == "IR") {
-
-
-
   }
-
-
 
   // var AN = updateCell(sheet, myRow, 'Message', text);
 
-
   // addNote(text = "contacted agent on " + Utilities.formatDate(new Date(), "GMT-4", "dd/MM/yyyy"));
-  addNote(text = myText, column);
-
-
+  addNote((text = myText), column);
 }
-
 
 // --- Example Usage ---
 
 function processMyMessage() {
-  let fullMessage = "• 6083393388 Hi, I'm interested in more information about the property in https://www.realtor.com/realestateandhomes-detail/19th-Dr_Friendship_WI_53934_M98019-30130?from=srp. Can you send me the county property number/APN? It looks like there is a road, but is there legal access, power and water? Thank you - Dan";
+  let fullMessage =
+    "• 6083393388 Hi, I'm interested in more information about the property in https://www.realtor.com/realestateandhomes-detail/19th-Dr_Friendship_WI_53934_M98019-30130?from=srp. Can you send me the county property number/APN? It looks like there is a road, but is there legal access, power and water? Thank you - Dan";
   let markerToFind = "Hi";
 
   let trimmedMessage = removePrefixUntil(fullMessage, markerToFind);
@@ -2326,19 +2303,17 @@ function processMyMessage() {
   Logger.log(trimmedMessage);
 }
 
-
 /**
  * Sends an email to the agent based on the selected row's data.
  * Adds a unique identifier to the email subject to track replies.
  * Updates a note in the sheet to indicate the email was sent.
  */
 function sendEmailFromRow(type) {
-
   const myRow = getSelectedRowObject(); // This function should be defined elsewhere to get data by header name
   // if (!myRow) {
   //   SpreadsheetApp.getUi().alert("Error", "Please select a row with data.", SpreadsheetApp.getUi().ButtonSet.OK);
   Logger.log(myRow);
-  // return 
+  // return
   //   return;
   // }
 
@@ -2346,22 +2321,16 @@ function sendEmailFromRow(type) {
   const selectedRowIndex = sheet.getActiveRange().getRow(); // Get the row index of the selected cell
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]; // Get headers
 
-
   let address;
   let subject;
   let myMessage;
 
   if (type == "R") {
-
-
     myMessage = getNote2(myRow, "Message"); // Assuming getNote2 retrieves note from "Message" column cell
 
     if (myMessage !== "") {
       myMessage = removePrefixUntil(myMessage, "Hi"); // This function needs to be defined
     }
-
-
-
 
     address = myRow.AgentEmail;
     subject = myRow.AAlink; // Original subject
@@ -2375,15 +2344,13 @@ function sendEmailFromRow(type) {
     Logger.log("Sending email to: " + address);
     Logger.log("Subject: " + subject);
     Logger.log("Body:\n" + myMessage);
-
   } else if (type == "PZ") {
     myMessage = getNote2(myRow, "PlanZoneMessage");
 
     address = myRow.PlanZoneEmail;
-    subject = "Is this property dividable?"
+    subject = "Is this property dividable?";
   } else if (type == "IR") {
-
-    subject = "Hi"
+    subject = "Hi";
 
     // const myRow = getSelectedRowObject();
     const agentJSON = myRow.INITIALREALTORCANVAS;
@@ -2395,30 +2362,32 @@ function sendEmailFromRow(type) {
     <p>I am a land investor and I came across one of your listings, which I thought was pretty well done on land.com. I see that you do a fair amount of land sales . I might be looking for someone to represent me, and I was wondering what counties you work in and know well. </p>
 
     <p>Thank you, </p>`;
-
   }
-
 
   try {
     MailApp.sendEmail({
       to: address,
       subject: subject,
       // body: myMessage,
-      htmlBody: myMessage + getSignature()
+      htmlBody: myMessage + getSignature(),
 
       // You can also add Bcc yourself to confirm it was sent, though not strictly necessary for this logic.
       // bcc: Session.getActiveUser().getEmail()
     });
-    SpreadsheetApp.getUi().alert("Success", "Email sent to " + address, SpreadsheetApp.getUi().ButtonSet.OK);
-
+    SpreadsheetApp.getUi().alert(
+      "Success",
+      "Email sent to " + address,
+      SpreadsheetApp.getUi().ButtonSet.OK,
+    );
   } catch (e) {
     Logger.log("Error sending email: " + e.message);
-    SpreadsheetApp.getUi().alert("Error", "Failed to send email: " + e.message, SpreadsheetApp.getUi().ButtonSet.OK);
+    SpreadsheetApp.getUi().alert(
+      "Error",
+      "Failed to send email: " + e.message,
+      SpreadsheetApp.getUi().ButtonSet.OK,
+    );
   }
-
-
 }
-
 
 // function sendEmailFromRow() {
 
@@ -2429,26 +2398,21 @@ function sendEmailFromRow(type) {
 
 //   let myMessage = getNote2(myRow, "Message");
 
-
 //   if (myMessage !== "") {
 
 //     emailText = removePrefixUntil(myMessage, "Hi");
-
 
 //   } else {
 
 //     emailText = "Hi, I'm interested in more information about the property in the title above. Can you send me the county property number/APN? \nIt looks like there is a road, but is there legal access, power and water?\n\nThank you, \n\nDan Nir\n508-296-5085";
 
-
 //   }
 //   address = myRow.AgentEmail;
 //   subject = myRow.AAlink;
 
-
 //   Logger.log(address);
 //   Logger.log(subject);
 //   Logger.log(emailText);
-
 
 //   MailApp.sendEmail({
 //     to: address,
@@ -2458,12 +2422,9 @@ function sendEmailFromRow(type) {
 
 //   addNote(text = "contacted agent on " + Utilities.formatDate(new Date(), "GMT-4", "dd/MM/yyyy"));
 
-
 // }
 
 function getAgent() {
-
-
   var selection = SpreadsheetApp.getSelection();
   var activerow = selection.getCurrentCell().getRow();
   var sheet = SpreadsheetApp.getActiveSheet();
@@ -2478,7 +2439,6 @@ function getAgent() {
   // const url = 'https://realio1-c51a04e6b1da.herokuapp.com/getAgent';
   // const url = "https://realio.onrender.com/getAgent";
 
-
   // var headers = {
   //   'sec-ch-ua': '"Chromium";v="118", "Google Chrome";v="118", "Not=A?Brand";v="99"',
   //   'sec-ch-ua-mobile': '?0',
@@ -2488,19 +2448,20 @@ function getAgent() {
   //   'Content-Type': 'application/x-www-form-urlencoded', // Add this line for POST requests
   // };
 
-  const url = "https://comfy-crisp-d74946.netlify.app/.netlify/functions/getAgent";
+  const url =
+    "https://comfy-crisp-d74946.netlify.app/.netlify/functions/getAgent";
   Logger.log(url);
 
   var payload = {
-    'val': myLink,
+    val: myLink,
   };
 
   var options = {
-    'method': 'post', // Change the method to "post"
-    'contentType': 'application/json',
+    method: "post", // Change the method to "post"
+    contentType: "application/json",
     // 'headers': headers,
-    'payload': JSON.stringify(payload),
-    'muteHttpExceptions': true
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true,
   };
 
   var response = UrlFetchApp.fetch(url, options);
@@ -2514,28 +2475,24 @@ function getAgent() {
 
   const agentDataObj = myObj.message[0];
   const nameStr = agentDataObj.name;
-  const emailStr = agentDataObj.emails.join(',');
+  const emailStr = agentDataObj.emails.join(",");
   const phoneStr = agentDataObj.phones.join(",");
 
   // myRow.AgentName = nameStr;
   // myRow.AgentEmail = emailStr;
   // myRow.AgentPhone = phoneStr;
 
-  var AN = updateCell(sheet, myRow, 'AgentName', nameStr);
-  var AE = updateCell(sheet, myRow, 'AgentEmail', emailStr);
-  var AP = updateCell(sheet, myRow, 'AgentPhone', phoneStr);
-
-
+  var AN = updateCell(sheet, myRow, "AgentName", nameStr);
+  var AE = updateCell(sheet, myRow, "AgentEmail", emailStr);
+  var AP = updateCell(sheet, myRow, "AgentPhone", phoneStr);
 }
 
 function getAPNS() {
-
   // const rows = getMultipleSelectedRowObjects();
   const rows = getMultipleSelectedRowObjectsDiscontinuous();
 
   Logger.log(rows);
   // return;
-
 
   // var selection = SpreadsheetApp.getSelection();
   // var activerow = selection.getCurrentCell().getRow();
@@ -2544,7 +2501,6 @@ function getAPNS() {
   const json = sheet2Json(sheet);
 
   for (var i = 0; i < rows.length; i += 1) {
-
     let myRow = rows[i];
     // const myRow = getSelectedRowObject();
     const lat = myRow.lat;
@@ -2558,21 +2514,21 @@ function getAPNS() {
 
     // var url = `https://realio.onrender.com/getAPN?lat=${lat}&lon=${lon}`;
 
-    const url = 'https://comfy-crisp-d74946.netlify.app/.netlify/functions/getAPNS';
+    const url =
+      "https://comfy-crisp-d74946.netlify.app/.netlify/functions/getAPNS";
 
     // const url = "https://www.postb.in/1742522889535-0620236727409"
 
-
     const payload = {
-      "lat": lat,
-      "lon": lon,
-      "message": "Hello World"
+      lat: lat,
+      lon: lon,
+      message: "Hello World",
     };
 
     const options = {
-      'method': 'post',
-      'contentType': 'application/json',
-      'payload': JSON.stringify(payload)
+      method: "post",
+      contentType: "application/json",
+      payload: JSON.stringify(payload),
     };
 
     // const responseData = JSON.parse(response.getContentText());
@@ -2594,20 +2550,17 @@ function getAPNS() {
       // const APN2 = result.message.APN2;
       const GEOM = result.message.GEOM;
 
-      var AN = updateCell(sheet, myRow, 'APN', APN);
+      var AN = updateCell(sheet, myRow, "APN", APN);
       // var AE = updateCell(sheet, myRow, 'APN2', APN2);
-      var AP = updateCell(sheet, myRow, 'GEOM', GEOM);
-
+      var AP = updateCell(sheet, myRow, "GEOM", GEOM);
     } catch (error) {
       // Log any errors
       Logger.log(error);
     }
   }
-
 }
 
 function getGEO() {
-
   var selection = SpreadsheetApp.getSelection();
   var activerow = selection.getCurrentCell().getRow();
   var sheet = SpreadsheetApp.getActiveSheet();
@@ -2627,11 +2580,11 @@ function getGEO() {
   // var url = 'https://property-lines.p.rapidapi.com/get_single_us_boundary?coords=40.79982062892406%2C%20-73.94531505009626&lat=40.79982062892406%2C&lon=-73.94531505009626';
 
   var options = {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'X-RapidAPI-Key': '6659718d96msh6e337e09016d37dp1296f0jsnbd289fc2acc9',
-      'X-RapidAPI-Host': 'property-lines.p.rapidapi.com'
-    }
+      "X-RapidAPI-Key": "6659718d96msh6e337e09016d37dp1296f0jsnbd289fc2acc9",
+      "X-RapidAPI-Host": "property-lines.p.rapidapi.com",
+    },
   };
 
   try {
@@ -2641,36 +2594,30 @@ function getGEO() {
   } catch (error) {
     Logger.log(error);
   }
-
 }
 
 function convertGeoJSONToWKT(geoJSON) {
   const coordinates = geoJSON.features[0].geometry.coordinates[0][0];
 
   // Convert GeoJSON coordinates to a simple polygon coordinate array
-  const polygon = coordinates.map(coord => [coord[1], coord[0]]);
+  const polygon = coordinates.map((coord) => [coord[1], coord[0]]);
 
   // Convert the polygon array to WKT manually
-  const wktString = `POLYGON((${polygon.map(point => point.join(' ')).join(',')}))`;
+  const wktString = `POLYGON((${polygon.map((point) => point.join(" ")).join(",")}))`;
 
   return wktString;
 }
 
 function buildKML() {
-
   const sheet = SpreadsheetApp.getActiveSheet();
   const myRow = getSelectedRowObject();
   const wkt = myRow.GEOM;
-  const mypolygon = parseWKTToPolygon(wkt)
+  const mypolygon = parseWKTToPolygon(wkt);
   Logger.log(mypolygon);
   const title = myRow.address + "," + myRow.county + " county";
   const description = myRow.AAlink;
-  createKMLFile(mypolygon, myRow.listing_id, title, description)
-
-
+  createKMLFile(mypolygon, myRow.listing_id, title, description);
 }
-
-
 
 function wktToGeojson(wkt) {
   var coords = wkt.match(/POLYGON\(\((.*?)\)\)/)[1].split(",");
@@ -2685,19 +2632,19 @@ function wktToGeojson(wkt) {
   }
 
   return {
-    "type": "Polygon",
-    "coordinates": [rings]
+    type: "Polygon",
+    coordinates: [rings],
   };
 }
 
 function normalizeGeoJSON1(input) {
-  if (!input || typeof input !== 'object') {
-    throw new Error('Input must be an object');
+  if (!input || typeof input !== "object") {
+    throw new Error("Input must be an object");
   }
 
   var geojson = {
-    type: input.type || 'Polygon',
-    coordinates: input.coordinates || []
+    type: input.type || "Polygon",
+    coordinates: input.coordinates || [],
   };
 
   if (input.bbox) {
@@ -2708,14 +2655,14 @@ function normalizeGeoJSON1(input) {
 }
 
 function normalizeGeoJSON(obj) {
-  if (!obj || typeof obj !== 'object') {
-    throw new Error('Input must be an object');
+  if (!obj || typeof obj !== "object") {
+    throw new Error("Input must be an object");
   }
 
   // Create clean GeoJSON structure
   var geojson = {
-    type: obj.type || 'Polygon',
-    coordinates: obj.coordinates || []
+    type: obj.type || "Polygon",
+    coordinates: obj.coordinates || [],
   };
 
   // Validate and add bbox if present
@@ -2733,7 +2680,10 @@ function calculateBbox(coordinates) {
     return null;
   }
 
-  var minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+  var minLng = Infinity,
+    minLat = Infinity,
+    maxLng = -Infinity,
+    maxLat = -Infinity;
 
   for (var i = 0; i < coordinates.length; i++) {
     var ring = coordinates[i];
@@ -2750,14 +2700,14 @@ function calculateBbox(coordinates) {
 }
 
 function normalizeGeoJSONForGeojsonIO(obj) {
-  if (!obj || typeof obj !== 'object') {
-    throw new Error('Input must be an object');
+  if (!obj || typeof obj !== "object") {
+    throw new Error("Input must be an object");
   }
 
   // Create clean geometry
   var geometry = {
-    type: obj.type || 'Polygon',
-    coordinates: obj.coordinates || []
+    type: obj.type || "Polygon",
+    coordinates: obj.coordinates || [],
   };
 
   // Add bbox if present
@@ -2767,32 +2717,31 @@ function normalizeGeoJSONForGeojsonIO(obj) {
 
   // Wrap in Feature
   var feature = {
-    type: 'Feature',
+    type: "Feature",
     geometry: geometry,
-    properties: {}  // Empty properties for simple display
+    properties: {}, // Empty properties for simple display
   };
 
   return feature;
 }
 
 function GeoJSONioUrlBuilder() {
-
   // {AAlink=https://www.realtor.com/realestateandhomes-detail/Alma-Rd_Jasper_AL_35501_M98724-43725?from=srp, AgentEmail=, address=Alma Rd, list_date=2024-03-17T23:25:39.000000Z, ACRES/PIECE=, =, flags=is_new_listing, RADIUS=20.0, AgentName=, state=Walker, county=2024-03-18T00:18:19.665Z, APN=, ppa=4000.0, RANGE_PPA=, lot_acres=41.0, updatedAt=al, listing_id=2.965226047E9, price=164000.0, NOTES=, GEOM=POLYGON((-111.179167643 32.5349351874,-111.179166834 32.5358422453,-111.180237626 32.5358413441,-111.180238435 32.5349342937,-111.179167643 32.5349351874)), PIECES=, COMP_AVG_DISTANCE=, relativeRow=4.0, APN2=, MIN_ACRES=5.0, lon=-87.214035, AgentPhone=, MAX_ACRES=10.0, absoluteRow=5.0, lat=33.802722}
 
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
   let currentSheetObjArr = sheet2Json(sheet);
   Logger.log("length: " + currentSheetObjArr.length);
 
-  const pushedRows = currentSheetObjArr.filter(x => {
-    if (!String(x.RoadURL || "")) { return x }
-  })
+  const pushedRows = currentSheetObjArr.filter((x) => {
+    if (!String(x.RoadURL || "")) {
+      return x;
+    }
+  });
 
-  let firstTenPushedRows = pushedRows.slice(0, 3);// get first 10 or less
+  let firstTenPushedRows = pushedRows.slice(0, 3); // get first 10 or less
   Logger.log(JSON.stringify(firstTenPushedRows));
 
-
   for (var i = 0; i < firstTenPushedRows.length; i++) {
-
     let myRow = firstTenPushedRows[i];
 
     const myParno = myRow.PARNO;
@@ -2800,7 +2749,6 @@ function GeoJSONioUrlBuilder() {
     const filterObj = { PARNO: myParno };
 
     try {
-
       const myJSON = fetchMongoDBDataAPI(filterObj, "alcornMERGED2subset");
       Logger.log(myJSON);
       const myObjects = JSON.parse(myJSON);
@@ -2810,13 +2758,12 @@ function GeoJSONioUrlBuilder() {
       Logger.log(geoJSONobj);
       const geojson_data = normalizeGeoJSON(geoJSONobj);
       Logger.log(geojson_data);
-      var buffered = turf.buffer(geojson_data, (100 * 0.000189394), 'miles')
+      var buffered = turf.buffer(geojson_data, 100 * 0.000189394, "miles");
       // var buffered = turf.buffer(geojson_data, 100, {units: 'feet'});
       const geoJsonObj = buffered.geometry;
       const newGeoJsonObj = normalizeGeoJSONForGeojsonIO(geoJsonObj);
-      const newGeojsonString = JSON.stringify(newGeoJsonObj)
+      const newGeojsonString = JSON.stringify(newGeoJsonObj);
       Logger.log(newGeojsonString);
-
 
       const encoded = encodeURIComponent(newGeojsonString);
       // const encoded = encodeURIComponent(newGeoJson);
@@ -2830,125 +2777,133 @@ function GeoJSONioUrlBuilder() {
       // const longUrl = `https://geojson.io/next/#data=data:application/json,${encoded}`;
       // https://geojson.io/next/ -- note that this needs a url shortner - url too long
 
-
       Logger.log(longUrl);
       // const clickable = shortenUrl(longUrl);
 
-
-      var ud = updateCell(sheet, myRow, 'RoadURL', longUrl);
-
+      var ud = updateCell(sheet, myRow, "RoadURL", longUrl);
     } catch (error) {
-      Logger.log(error)
+      Logger.log(error);
     }
 
-    Logger.log("FIN")
-
+    Logger.log("FIN");
   }
-
 }
-
 
 function createKMLFile(latLongPolygon, listing_id, title, description) {
   // Create KML content with title and description
-  var kmlContent = '<?xml version="1.0" encoding="UTF-8"?>' +
+  var kmlContent =
+    '<?xml version="1.0" encoding="UTF-8"?>' +
     '<kml xmlns="http://www.opengis.net/kml/2.2">' +
-    '<Document>' +
-    '<Placemark>' +
-    '<name>' + title + '</name>' +
-    '<description>' + description + '</description>' +
-    '<Polygon>' +
-    '<outerBoundaryIs>' +
-    '<LinearRing>' +
-    '<coordinates>';
+    "<Document>" +
+    "<Placemark>" +
+    "<name>" +
+    title +
+    "</name>" +
+    "<description>" +
+    description +
+    "</description>" +
+    "<Polygon>" +
+    "<outerBoundaryIs>" +
+    "<LinearRing>" +
+    "<coordinates>";
 
   // Add coordinates to KML content
   latLongPolygon.forEach(function (point) {
-    kmlContent += point[1] + ',' + point[0] + ' ';
+    kmlContent += point[1] + "," + point[0] + " ";
   });
 
   // Close KML content
-  kmlContent += '</coordinates>' +
-    '</LinearRing>' +
-    '</outerBoundaryIs>' +
-    '</Polygon>' +
-    '</Placemark>' +
-    '</Document>' +
-    '</kml>';
+  kmlContent +=
+    "</coordinates>" +
+    "</LinearRing>" +
+    "</outerBoundaryIs>" +
+    "</Polygon>" +
+    "</Placemark>" +
+    "</Document>" +
+    "</kml>";
 
   // Get the folder where you want to save the KML file
-  var folder = DriveApp.getFolderById('1ssPWu5gWTQB-fW3YoOKagQxwITmc4AKy');
+  var folder = DriveApp.getFolderById("1ssPWu5gWTQB-fW3YoOKagQxwITmc4AKy");
 
   // Save KML content to a file in the specified folder
   var fileName = `${listing_id}.kml`;
 
-  var kmlFile = folder.createFile(fileName, kmlContent, 'application/vnd.google-earth.kml+xml');
-  Logger.log('KML file created: ' + fileName + ' in folder: ' + folder.getName());
+  var kmlFile = folder.createFile(
+    fileName,
+    kmlContent,
+    "application/vnd.google-earth.kml+xml",
+  );
+  Logger.log(
+    "KML file created: " + fileName + " in folder: " + folder.getName(),
+  );
 }
 
-
 function aggregateMongoDBData(lon, lat, coll) {
-
   //  1GxuC9AAuc77xJklnS1PSHVKhZUt3QkcOaqdSYRqoeQVrSnf8jtGtLO3zGlNfm4T -- this is the api auth token and cannot be retrieved
 
-
-  var url = "https://us-east-1.aws.data.mongodb-api.com/app/data-wygci/endpoint/data/v1/action/aggregate";
-  var apiKey = "1GxuC9AAuc77xJklnS1PSHVKhZUt3QkcOaqdSYRqoeQVrSnf8jtGtLO3zGlNfm4T";
-  var authToken = "1GxuC9AAuc77xJklnS1PSHVKhZUt3QkcOaqdSYRqoeQVrSnf8jtGtLO3zGlNfm4T";
+  var url =
+    "https://us-east-1.aws.data.mongodb-api.com/app/data-wygci/endpoint/data/v1/action/aggregate";
+  var apiKey =
+    "1GxuC9AAuc77xJklnS1PSHVKhZUt3QkcOaqdSYRqoeQVrSnf8jtGtLO3zGlNfm4T";
+  var authToken =
+    "1GxuC9AAuc77xJklnS1PSHVKhZUt3QkcOaqdSYRqoeQVrSnf8jtGtLO3zGlNfm4T";
   var headers = {
     "Content-Type": "application/json",
     "Access-Control-Request-Headers": "*",
     "api-key": apiKey,
-    "Authorization": authToken,
+    Authorization: authToken,
   };
 
-
   var payload = {
-    "pipeline": [
+    pipeline: [
       {
-        "$match": {
-          "coordinate": { $exists: true, $ne: null }
-        }
+        $match: {
+          coordinate: { $exists: true, $ne: null },
+        },
       },
       {
-        "$set": {
-          "distance": {
-            "$expr": {
-              "$function": {
-                "body": function (lat1, lon1, lat2, lon2) {
+        $set: {
+          distance: {
+            $expr: {
+              $function: {
+                body: function (lat1, lon1, lat2, lon2) {
                   // Haversine formula to calculate distance
                   var R = 6371; // km
                   var dLat = toRadians(lat2 - lat1);
                   var dLon = toRadians(lon2 - lon1);
                   var lat1Rad = toRadians(lat1);
                   var lat2Rad = toRadians(lat2);
-                  var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                    Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1Rad) * Math.cos(lat2Rad);
+                  var a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.sin(dLon / 2) *
+                      Math.sin(dLon / 2) *
+                      Math.cos(lat1Rad) *
+                      Math.cos(lat2Rad);
                   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                   var distance = R * c;
                   return distance;
                 },
-                "args": ["$coordinate.lat", "$coordinate.lon", lat, lon],
-                "lang": "js"
-              }
-            }
-          }
-        }
-      }
+                args: ["$coordinate.lat", "$coordinate.lon", lat, lon],
+                lang: "js",
+              },
+            },
+          },
+        },
+      },
     ],
-    "database": "mydata",
-    "dataSource": "Cluster0",
-    "collection": coll
+    database: "mydata",
+    dataSource: "Cluster0",
+    collection: coll,
   };
 
   var options = {
     method: "post",
     headers: headers,
     payload: JSON.stringify(payload),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   };
 
   // const query = { list_date: { $gte: dt }, state: st };
-
 
   var response = UrlFetchApp.fetch(url, options);
 
@@ -2967,17 +2922,16 @@ function aggregateMongoDBData(lon, lat, coll) {
 }
 
 function aggregateTest() {
-
   const myRow = getSelectedRowObject();
 
   // Logger.log(" comps : ");
   // // const myQuery = geoQuery(-87.214035,33.802722, 200);
   // const myQuery = geoQuery(Number(myRow.lon), Number(myRow.lat), Number(myRow.RADIUS), Number(myRow.MIN_ACRES), Number(myRow.MAX_ACRES));
 
-  const res = aggregateMongoDBData(Number(myRow.lon), Number(myRow.lat), "wisconsinSold")
+  const res = aggregateMongoDBData(
+    Number(myRow.lon),
+    Number(myRow.lat),
+    "wisconsinSold",
+  );
   Logger.log(res);
-
-
-
 }
-
