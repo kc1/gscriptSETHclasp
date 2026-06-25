@@ -47,6 +47,11 @@ function onOpen() {
       name: "3) Update selected rows with Screenshot Links from Named Mongo bucket (alcornBucket) ",
       functionName: "updateWithScreenshotPaths",
     },
+    {
+      name: "4) Colour filtered rows blue ",
+      functionName: "testColorRows",
+    }
+    
   ];
 
   ss.addMenu("Extended", menu);
@@ -161,7 +166,18 @@ function tester() {
 }
 
 function testColorRows() {
-  colorRowsLightBlue([3, 7, 15, 22, 35, 50]);   // ← Put your row numbers here
+  // colorRowsLightBlue([3, 7, 15, 22, 35, 50]);   // ← Put your row numbers here
+  // absoluteRow
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+  const objArr = sheet2Json(sheet);
+  Logger.log("length: " + objArr.length);
+  const filteredRows = objArr.filter((row) => {
+    return row.RoadAvailable.length == 3 && row.StructuresPresent.length == 2 && row.WaterResponse.length == 3;
+  });
+  const absoluteRowNumbers = filteredRows.map(row => row.absoluteRow);
+  const out = colorRowsLightBlue(absoluteRowNumbers);
+  Logger.log(out);
+
 }
 
 function colorRowsLightBlue(rowNumbers) {
@@ -179,10 +195,11 @@ function colorRowsLightBlue(rowNumbers) {
   uniqueRows.forEach(row => {
     sheet.getRange(row, 1, 1, lastColumn).setBackground(lightBlue);
   });
+  return 'FIN';
 }
 
-function dummy() {}
-function dummy2() {}
+function dummy() { }
+function dummy2() { }
 /**
  * Safely parses the JSON response from your Vision AI prompt.
  * Strips out any Markdown text formatting first.
@@ -1995,9 +2012,9 @@ function cosineDistanceBetweenPoints(lat1, lon1, lat2, lon2) {
   const a =
     Math.sin(deltaP / 2) * Math.sin(deltaP / 2) +
     Math.cos(p1) *
-      Math.cos(p2) *
-      Math.sin(deltaLambda / 2) *
-      Math.sin(deltaLambda / 2);
+    Math.cos(p2) *
+    Math.sin(deltaLambda / 2) *
+    Math.sin(deltaLambda / 2);
   const d = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * R;
   return d;
 }
@@ -2876,9 +2893,9 @@ function aggregateMongoDBData(lon, lat, coll) {
                   var a =
                     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                     Math.sin(dLon / 2) *
-                      Math.sin(dLon / 2) *
-                      Math.cos(lat1Rad) *
-                      Math.cos(lat2Rad);
+                    Math.sin(dLon / 2) *
+                    Math.cos(lat1Rad) *
+                    Math.cos(lat2Rad);
                   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                   var distance = R * c;
                   return distance;
