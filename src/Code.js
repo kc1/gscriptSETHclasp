@@ -51,7 +51,7 @@ function onOpen() {
       name: "4) Colour filtered rows blue ",
       functionName: "testColorRows",
     }
-    
+
   ];
 
   ss.addMenu("Extended", menu);
@@ -163,6 +163,43 @@ function tester() {
   startup();
   Utilities.sleep(210 * 1000);
   getNewWIProps();
+}
+
+function runAlcornGeoJsonPush() {
+  const x = myTimedFunction(alcornGeoJsonPush, [9])
+}
+
+function runPostToBuildScreenshotsFromLink() {
+  const x = myTimedFunction(postToBuildScreenshotsFromLink, [10])
+}
+
+function runUpdateWithRoadandBuildingScreenshotPaths() {
+  const x = myTimedFunction(updateWithRoadandBuildingScreenshotPaths, [12])
+}
+
+function runRoadAvailableUsingLLM() {
+  const x = myTimedFunction(roadAvailableUsingLLM, [13, 14, 15, 16, 17])
+}
+
+function runStructurePresentPrompt() {
+  const x = myTimedFunction(structurePresentPrompt, [14, 15, 16, 17, 18])
+}
+
+function myTimedFunction(functionToRun, hoursToRun) {
+  const now = new Date();
+  const hour = now.getHours();     // 0-23 (local time of the script)
+  const minute = now.getMinutes();
+
+  // Run only between 1:00 PM and 1:59 PM (adjust as needed)
+  if (hoursToRun.includes(hour)) {               // 13 = 1 PM in 24-hour format
+    console.log(`Running at ${now.toLocaleTimeString()}`);
+
+    const x = functionToRun();
+
+  } else {
+    // Optional: log when it's outside the window
+    // console.log(`Outside window - skipping (${hour}:${minute})`);
+  }
 }
 
 function testColorRows() {
