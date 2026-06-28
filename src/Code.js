@@ -174,21 +174,23 @@ function runPostToBuildScreenshotsFromLink() {
 }
 
 function runUpdateWithRoadandBuildingScreenshotPaths() {
-  const x = myTimedFunction(updateWithRoadandBuildingScreenshotPaths, [12])
+  const x = myTimedFunction(updateWithRoadandBuildingScreenshotPaths, [11])
 }
 
 function runRoadAvailableUsingLLM() {
-  const x = myTimedFunction(roadAvailableUsingLLM, [13, 14, 15, 16, 17])
+  const x = myTimedFunction(roadAvailableUsingLLM, [10, 11, 13, 14, 15, 16, 17])
 }
 
 function runStructurePresentPrompt() {
-  const x = myTimedFunction(structurePresentPrompt, [14, 15, 16, 17, 18])
+  const x = myTimedFunction(structurePresentPrompt, [12, 13, 14, 15, 16, 17, 18])
 }
 
 function myTimedFunction(functionToRun, hoursToRun) {
   const now = new Date();
   const hour = now.getHours();     // 0-23 (local time of the script)
   const minute = now.getMinutes();
+  
+  Logger.log(`Current time: ${hour}:${minute}`);
 
   // Run only between 1:00 PM and 1:59 PM (adjust as needed)
   if (hoursToRun.includes(hour)) {               // 13 = 1 PM in 24-hour format
@@ -198,7 +200,7 @@ function myTimedFunction(functionToRun, hoursToRun) {
 
   } else {
     // Optional: log when it's outside the window
-    // console.log(`Outside window - skipping (${hour}:${minute})`);
+    Logger.log(`Outside window - skipping (${hour}:${minute})`);
   }
 }
 
@@ -1251,7 +1253,7 @@ function roadAvailableUsingLLM() {
   Logger.log("length: " + currentSheetObjArr.length);
 
   const pushedRows = currentSheetObjArr.filter((x) => {
-    if (x.WaterURL.includes("dropbox") && !String(x.RoadAvailable || "")) {
+    if (x.RoadURL.includes("dropbox") && !String(x.RoadAvailable || "")) {
       return x;
     }
   });
