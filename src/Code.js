@@ -34,24 +34,27 @@ function onOpen() {
     },
 
     {
-      name: "1) Push to Named Bucket (up to 50), for home access-then run with IMAGEAI to generate screenshots",
+      name: "2A) Push to Named Bucket (up to 50), for home access-then run with IMAGEAI to generate screenshots",
       functionName: "alcornPush",
     },
 
     {
-      name: "2) Run sethProp (runSethApp) with IMAGEAI to generate screenshots --api updated",
+      name: "2B) Run sethProp (runSethApp) with IMAGEAI to generate screenshots --api updated",
       functionName: "postToSethProp",
     },
 
     {
-      name: "3) Update selected rows with Screenshot Links from Named Mongo bucket (alcornBucket) ",
+      name: "2C) Update selected rows with Screenshot Links from Named Mongo bucket (alcornBucket) ",
       functionName: "updateWithScreenshotPaths",
     },
     {
-      name: "4) Colour filtered rows blue ",
+      name: "2D)  Y/N on Water Buildability using WaterURL with LLM  ",
+      functionName: "waterBuildableUsingLLM",
+    },
+    {
+      name: "Colour filtered rows blue ",
       functionName: "testColorRows",
-    }
-
+    },
   ];
 
   ss.addMenu("Extended", menu);
@@ -166,38 +169,56 @@ function tester() {
 }
 
 function runAlcornGeoJsonPush() {
-  const x = myTimedFunction(alcornGeoJsonPush, [9])
+  const x = myTimedFunction(alcornGeoJsonPush, [9]);
 }
 
 function runPostToBuildScreenshotsFromLink() {
-  const x = myTimedFunction(postToBuildScreenshotsFromLink, [10])
+  const x = myTimedFunction(postToBuildScreenshotsFromLink, [10]);
 }
 
 function runUpdateWithRoadandBuildingScreenshotPaths() {
-  const x = myTimedFunction(updateWithRoadandBuildingScreenshotPaths, [11])
+  const x = myTimedFunction(updateWithRoadandBuildingScreenshotPaths, [11]);
 }
 
 function runRoadAvailableUsingLLM() {
-  const x = myTimedFunction(roadAvailableUsingLLM, [10, 11, 13, 14, 15, 16, 17])
+  const x = myTimedFunction(
+    roadAvailableUsingLLM,
+    [10, 11, 13, 14, 15, 16, 17],
+  );
 }
 
 function runStructurePresentPrompt() {
-  const x = myTimedFunction(structurePresentPrompt, [12, 13, 14, 15, 16, 17, 18])
+  const x = myTimedFunction(
+    structurePresentPrompt,
+    [12, 13, 14, 15, 16, 17, 18],
+  );
+}
+
+function runAlcornPush() {
+  const x = myTimedFunction(alcornPush, [19]);
+}
+
+function runPostToSethProp() {
+  const x = myTimedFunction(postToSethProp, [10]);
+}
+
+function runUpdateWithScreenshotPaths() {
+  const x = myTimedFunction(updateWithScreenshotPaths, [11]);
 }
 
 function myTimedFunction(functionToRun, hoursToRun) {
   const now = new Date();
-  const hour = now.getHours();     // 0-23 (local time of the script)
+  const hour = now.getHours(); // 0-23 (local time of the script)
   const minute = now.getMinutes();
-  
+
   Logger.log(`Current time: ${hour}:${minute}`);
 
   // Run only between 1:00 PM and 1:59 PM (adjust as needed)
-  if (hoursToRun.includes(hour)) {               // 13 = 1 PM in 24-hour format
+  if (hoursToRun.includes(hour)) {
+    // 13 = 1 PM in 24-hour format
     console.log(`Running at ${now.toLocaleTimeString()}`);
 
     const x = functionToRun();
-
   } else {
     // Optional: log when it's outside the window
     Logger.log(`Outside window - skipping (${hour}:${minute})`);
@@ -211,16 +232,20 @@ function testColorRows() {
   const objArr = sheet2Json(sheet);
   Logger.log("length: " + objArr.length);
   const filteredRows = objArr.filter((row) => {
-    return row.RoadAvailable.length == 3 && row.StructuresPresent.length == 2 && row.WaterResponse.length == 3;
+    return (
+      row.RoadAvailable.length == 3 &&
+      row.StructuresPresent.length == 2 &&
+      row.WaterResponse.length == 3
+    );
   });
-  const absoluteRowNumbers = filteredRows.map(row => row.absoluteRow);
+  const absoluteRowNumbers = filteredRows.map((row) => row.absoluteRow);
   const out = colorRowsLightBlue(absoluteRowNumbers);
   Logger.log(out);
-
 }
 
 function colorRowsLightBlue(rowNumbers) {
-  if (!rowNumbers || !Array.isArray(rowNumbers) || rowNumbers.length === 0) return;
+  if (!rowNumbers || !Array.isArray(rowNumbers) || rowNumbers.length === 0)
+    return;
 
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const lastColumn = sheet.getLastColumn();
@@ -228,17 +253,147 @@ function colorRowsLightBlue(rowNumbers) {
 
   // Remove duplicates and sort
   const uniqueRows = [...new Set(rowNumbers)]
-    .filter(r => Number.isInteger(r) && r >= 1)
+    .filter((r) => Number.isInteger(r) && r >= 1)
     .sort((a, b) => a - b);
 
-  uniqueRows.forEach(row => {
+  uniqueRows.forEach((row) => {
     sheet.getRange(row, 1, 1, lastColumn).setBackground(lightBlue);
   });
-  return 'FIN';
+  return "FIN";
 }
 
 function dummy() { }
 function dummy2() { }
+
+/**
+ * Returns the complete prompt for parcel buildability evaluation with every line indented by 4 spaces
+ * @return {string} The full system prompt (indented)
+ */
+
+function getWaterPrompt() {
+  return `    Act as an expert land surveyor and GIS analyst specializing in parcel and flood zone/ground water assessment.
+    Your task: Evaluate the highlighted parcel for buildability based on its ground water, wetland, and flood zone profile. Focus on the light blue, cyan, and patterned shaded areas (which indicate FEMA floodplains, wetlands, and surface water).
+    All properties in this evaluation have been prescreened and confirmed to have road access. Therefore, do not evaluate whether road access exists — assume it does along the named roads bordering or crossing the parcel boundaries.
+    Decision Rule:
+    The lot is considered buildable (YES) ONLY if BOTH conditions are met:
+    a) The total water/flood zone coverage (all blue/cyan areas STRICTLY INSIDE the parcel) is LESS THAN 50% of the total internal lot area.
+    b) The clear, unshaded (tan/beige) dry land is easily accessible from at least one bordering road without having to cross significant water or floodways. Any major internal water bodies or flood zones must remain situated away from the primary road access areas.
+    If the internal water/flood zone coverage is ≥50%, OR if the unshaded dry land is entirely cut off from all adjacent roads by an internal flood zone/wetland, the lot is NOT buildable (NO).
+    Step 1: Identify the highlighted lot.
+    Find the primary parcel being evaluated. It is enclosed by a distinct, solid blue outline. There is often a black-and-white teardrop map pin with the letters id. in or near the parcel.
+    CRITICAL: Focus only on the area enclosed by this blue boundary line. Massive flood zones or water bodies frequently border the property directly on the outside—you must actively ignore all environmental features to the outside of the parcel line. Do not allow adjacent external floodways to artificially inflate your estimate of the internal area. Ignore UI elements, side menus, text boxes, and search bars.
+    Step 2: Water & Flood Coverage Analysis (Critical Filter)
+    Carefully evaluate only the space inside the blue outline. Estimate the percentage of the highlighted parcel covered by the blue/cyan/teal shaded features (referring to the map's legend for Floodway, 100-year, 500-year, and Wetlands).
+    Locate the main roads (indicated by white/yellow lines and labels like "County Rd 161") bordering the parcel.
+    Determine if the clear, unshaded (beige/tan) land is accessible directly from these roads, or if the internal water features block that access from all available road frontages.
+    Step 3: Output Requirements
+    You must respond with ONLY a raw, valid JSON object following exactly this schema. Do not include markdown formatting, markdown code blocks, or any conversational text outside the JSON.
+    JSON Schema:
+    {
+    "Analysis_LotFound": "Yes/No. State if you found the parcel enclosed by the blue outline.",
+    "Analysis_WaterCoverage": "Detailed assessment of the flood/wetland percentage STRICTLY INSIDE the parcel boundaries (include approximate %) and its position relative to the main roads (e.g., 'Internal flood zone blocks all highway access' or 'Dry land accessible directly from the northern road').",
+    "Buildable": "Yes/No",
+    "Reasoning": "Brief summary of the final decision based exclusively on the internal water coverage percentage and road accessibility criteria."
+    }`;
+}
+
+function waterBuildableUsingLLM() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+
+  const netlifyFunctionName = "openRouterPrompt2";
+  const responseColumnName = "Buildable";
+  const screenshotColumnName = "WaterURL";
+
+  const currentSheetObjArr = sheet2Json(sheet);
+  Logger.log("first 2 ");
+  Logger.log(currentSheetObjArr[0]);
+  Logger.log(currentSheetObjArr[1]);
+
+  // Filter rows that haven't been processed yet (no RoadAvailable prompt? Wait, adjust filter as needed)
+  // Assuming you want rows where GeneratedAnswer is empty
+  const toProcess = currentSheetObjArr.filter((row) => {
+    return (
+      row[screenshotColumnName].includes("http") &&
+      row[responseColumnName] == ""
+    );
+  });
+
+  Logger.log(`Rows to process: ${toProcess.length}`);
+
+  // Process first 10 (or all if you prefer)
+  const firstXPushedRows = toProcess.slice(0, 10);
+
+  if (firstXPushedRows.length === 0) {
+    Logger.log("No new rows to process.");
+    return;
+  }
+
+  let updatedRows = [];
+  for (let i = 0; i < firstXPushedRows.length; i++) {
+    const element = firstXPushedRows[i];
+    element.screenshotURL = element[screenshotColumnName];
+    element.PROMPT = getWaterPrompt();
+    updatedRows.push(element);
+  }
+
+  Logger.log(JSON.stringify(updatedRows));
+
+  const url = APIURL + netlifyFunctionName;
+  Logger.log(url);
+
+  var options = {
+    method: "post",
+    contentType: "application/json",
+    payload: JSON.stringify({
+      myrows: updatedRows,
+      model: "set in netlify",
+    }),
+    muteHttpExceptions: true,
+  };
+
+  Logger.log("payload");
+  Logger.log(
+    JSON.stringify({
+      myrows: updatedRows,
+      model: "set in netlify",
+    }),
+  );
+  // model: "stepfun/step-3.7-flash",
+
+  let responseObj;
+
+  try {
+    const response = UrlFetchApp.fetch(url, options);
+    const httpCode = response.getResponseCode();
+    const body = response.getContentText();
+    Logger.log(httpCode);
+    Logger.log(body);
+    responseObj = parseSurveyorResponse(body);
+  } catch (error) {
+    Logger.log(error);
+  }
+
+  Logger.log("HERE:");
+
+  Logger.log(responseObj);
+
+  for (let i = 0; i < responseObj.length; i++) {
+    const myRow = responseObj[i];
+    try {
+      const jsonString = myRow.GeneratedResponse;
+      const parsed = parseSurveyorResponse(jsonString);
+
+      let YN = parsed.Buildable || "";
+      // let YN = parsed["buildable"] || "";
+
+      var C = updateCell(sheet, myRow, responseColumnName, YN);
+    } catch (e) {
+      Logger.log(`Error processing row ${i}: ${e}`);
+      var C = updateCell(sheet, myRow, responseColumnName, "ERROR");
+    }
+  }
+}
+
 /**
  * Safely parses the JSON response from your Vision AI prompt.
  * Strips out any Markdown text formatting first.
@@ -1516,7 +1671,7 @@ function updateNamedBucket(collection, numberToPush) {
       x.ContourURL == "" ||
       x.WaterURL == "" ||
       x.RoadAvailable.length == 3 || //yes
-      x.StructuresPresent.length == 2  // no
+      x.StructuresPresent.length == 2 // no
     ) {
       return x;
     }
@@ -1588,25 +1743,29 @@ function pushToNamedBucket(collection, numberToPush) {
   Logger.log("length: " + currentSheetObjArr.length);
 
   const payload = currentSheetObjArr.filter((x) => {
-    if (x.ContourURL == "" || x.WaterURL == "") {
+    if (
+      x.WaterURL == "" &&
+      x.RoadAvailable.length == 3 &&
+      x.StructuresPresent.length == 2
+    ) {
       return x;
     }
   });
-  let firstFiftyPushedRows = payload.slice(0, numberToPush); // get first 50 or less
+  let firstXPushedRows = payload.slice(0, numberToPush); // get first 50 or less
 
   // Updated payload: Wrap the array and collection name in an object
   var options = {
     method: "post",
     contentType: "application/json",
     payload: JSON.stringify({
-      data: firstFiftyPushedRows, // The array of objects
+      data: firstXPushedRows, // The array of objects
       collectionName: collection, // The collection name as a string
     }),
     muteHttpExceptions: true,
   };
 
-  Logger.log(firstFiftyPushedRows);
-  Logger.log(typeof firstFiftyPushedRows);
+  Logger.log(firstXPushedRows);
+  Logger.log(typeof firstXPushedRows);
 
   // const url = 'https://www.postb.in/1739670263592-0602835712488';
   let url =
