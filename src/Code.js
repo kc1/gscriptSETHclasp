@@ -206,6 +206,10 @@ function runUpdateWithScreenshotPaths() {
   const x = myTimedFunction(updateWithScreenshotPaths, [11]);
 }
 
+function runWaterBuildableUsingLLM() {  
+  const x = myTimedFunction(waterBuildableUsingLLM, [12, 13, 14, 15, 16, 17]);  
+}
+
 function myTimedFunction(functionToRun, hoursToRun) {
   const now = new Date();
   const hour = now.getHours(); // 0-23 (local time of the script)
