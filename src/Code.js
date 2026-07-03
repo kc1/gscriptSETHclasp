@@ -55,6 +55,10 @@ function onOpen() {
       name: "Colour filtered rows blue ",
       functionName: "testColorRows",
     },
+    {
+      name: "Copy to SHEET2 ",
+      functionName: "toFiltered",
+    },
   ];
 
   ss.addMenu("Extended", menu);
@@ -206,8 +210,8 @@ function runUpdateWithScreenshotPaths() {
   const x = myTimedFunction(updateWithScreenshotPaths, [11]);
 }
 
-function runWaterBuildableUsingLLM() {  
-  const x = myTimedFunction(waterBuildableUsingLLM, [12, 13, 14, 15, 16, 17]);  
+function runWaterBuildableUsingLLM() {
+  const x = myTimedFunction(waterBuildableUsingLLM, [12, 13, 14, 15, 16, 17]);
 }
 
 function myTimedFunction(functionToRun, hoursToRun) {
@@ -227,6 +231,38 @@ function myTimedFunction(functionToRun, hoursToRun) {
     // Optional: log when it's outside the window
     Logger.log(`Outside window - skipping (${hour}:${minute})`);
   }
+}
+
+function toFiltered() {
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+  const objArr = sheet2Json(sheet);
+  Logger.log("length: " + objArr.length);
+  const sheetOneFilteredRows = objArr.filter((row) => {
+    return (
+      row.RoadAvailable.length == 3 &&
+      row.StructuresPresent.length == 2 &&
+      row.Buildable.length == 3
+    );
+  });
+
+  const sheetOnefilteredRowIDs = sheetOneFilteredRows.map((row) => row.ID);
+
+  const sheet2 = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("FILTERED");
+  const objArr2 = sheet2Json(sheet2);
+  Logger.log("length: " + objArr2.length);
+  const sheetTwofilteredRowIDs = objArr2.filter((row) => row.ID);
+  const newRowIDs = sheetOnefilteredRowIDs.filter(
+    (id) => !sheetTwofilteredRowIDs.includes(id),
+  );
+  const newRows = sheetOneFilteredRows.filter((row) =>
+    newRowIDs.includes(row.ID),
+  );
+  const slicedNewRows = newRows.slice(0, 10); // Limit to first 10 rows
+  for (const row of slicedNewRows) {
+    const x = addRowFromObject(row, sheet2) 
+  }
+  return "FIN";
 }
 
 function testColorRows() {
@@ -266,8 +302,8 @@ function colorRowsLightBlue(rowNumbers) {
   return "FIN";
 }
 
-function dummy() { }
-function dummy2() { }
+function dummy() {}
+function dummy2() {}
 
 /**
  * Returns the complete prompt for parcel buildability evaluation with every line indented by 4 spaces
@@ -2214,9 +2250,9 @@ function cosineDistanceBetweenPoints(lat1, lon1, lat2, lon2) {
   const a =
     Math.sin(deltaP / 2) * Math.sin(deltaP / 2) +
     Math.cos(p1) *
-    Math.cos(p2) *
-    Math.sin(deltaLambda / 2) *
-    Math.sin(deltaLambda / 2);
+      Math.cos(p2) *
+      Math.sin(deltaLambda / 2) *
+      Math.sin(deltaLambda / 2);
   const d = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * R;
   return d;
 }
@@ -3095,9 +3131,9 @@ function aggregateMongoDBData(lon, lat, coll) {
                   var a =
                     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                     Math.sin(dLon / 2) *
-                    Math.sin(dLon / 2) *
-                    Math.cos(lat1Rad) *
-                    Math.cos(lat2Rad);
+                      Math.sin(dLon / 2) *
+                      Math.cos(lat1Rad) *
+                      Math.cos(lat2Rad);
                   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                   var distance = R * c;
                   return distance;
