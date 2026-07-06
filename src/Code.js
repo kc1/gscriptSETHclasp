@@ -56,7 +56,7 @@ function onOpen() {
       functionName: "testColorRows",
     },
     {
-      name: "Copy to SHEET2 ",
+      name: "Copy to FILTERED ",
       functionName: "toFiltered",
     },
   ];
@@ -251,9 +251,9 @@ function toFiltered() {
   const sheet2 = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("FILTERED");
   const objArr2 = sheet2Json(sheet2);
   Logger.log("length: " + objArr2.length);
-  const sheetTwofilteredRowIDs = objArr2.filter((row) => row.ID);
+  const FILTEREDRowIDs = objArr2.map((row) => row.ID);
   const newRowIDs = sheetOnefilteredRowIDs.filter(
-    (id) => !sheetTwofilteredRowIDs.includes(id),
+    (id) => !FILTEREDRowIDs.includes(id),
   );
   const newRows = sheetOneFilteredRows.filter((row) =>
     newRowIDs.includes(row.ID),
