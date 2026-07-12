@@ -25,7 +25,7 @@ function onOpen() {
 
     {
       name: "1E)  Y/N on StructuresPresent using BuildingURL with LLM  ",
-      functionName: "structurePresentPrompt",
+      functionName: "structurePresentUsingLLM",
     },
 
     {
@@ -191,9 +191,9 @@ function runRoadAvailableUsingLLM() {
   );
 }
 
-function runStructurePresentPrompt() {
+function runstructurePresentUsingLLM() {
   const x = myTimedFunction(
-    structurePresentPrompt,
+    structurePresentUsingLLM,
     [12, 13, 14, 15, 16, 17, 18],
   );
 }
@@ -475,7 +475,7 @@ function parseSurveyorResponse(responseText) {
   }
 }
 
-function structurePresentPrompt() {
+function structurePresentUsingLLM() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const sheetName = sheet.getName();
   if (!sheetName == "Sheet1") {
@@ -486,14 +486,14 @@ function structurePresentPrompt() {
     );
     return;
   }
-  const x = StructuresPresentPromptStage1(
+  const x = StructuresPresentPromptTest(
     "StructuresPresent",
     "Sheet1",
     "openRouterPrompt2",
   );
 }
 
-function StructuresPresentPromptStage1(
+function StructuresPresentPromptTest(
   responseColumnName,
   sheetName,
   netlifyFunctionName,
@@ -507,9 +507,9 @@ function StructuresPresentPromptStage1(
   Logger.log(currentSheetObjArr[1]);
 
   // Filter rows that haven't been processed yet (no RoadAvailable prompt? Wait, adjust filter as needed)
-  // Assuming you want rows where GeneratedAnswer is empty
+  // Assuming you want rows where GeneratedAnswer is empty and RoadAvailable is YES
   const toProcess = currentSheetObjArr.filter((row) => {
-    return row.BuildingURL.includes("http") && row[responseColumnName] == "";
+    return row.BuildingURL.includes("http") && row.RoadAvailable.length == 3 && row[responseColumnName] == "";
   });
 
   Logger.log(`Rows to process: ${toProcess.length}`);

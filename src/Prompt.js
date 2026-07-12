@@ -22,7 +22,7 @@ function waterStatusMatches() {
   Logger.log(out);
 }
 
-function structurePresentPromptStage1() {
+function structurePresentUsingLLMTest() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const sheetName = sheet.getName();
   if (!sheetName == "ImprovementOPTIMIZER") {

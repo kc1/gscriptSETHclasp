@@ -1,3 +1,159 @@
+/**
+ * Install triggers from a JSON backup file in Drive
+ */
+function installTriggersFromBackup() {
+  const fileName = "triggers_backup.json";   // Change if needed
+  
+  // Find the file in Drive
+  const files = DriveApp.getFilesByName(fileName);
+  if (!files.hasNext()) {
+    throw new Error(`File "${fileName}" not found in Drive.`);
+  }
+  
+  const file = files.next();
+  const content = file.getBlob().getDataAsString();
+  const triggerData = JSON.parse(content);
+  
+  console.log(`Found ${triggerData.length} triggers to install.`);
+  
+  // Delete existing triggers first to avoid duplicates
+  deleteAllTriggers();
+  
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  triggerData.forEach(item => {
+    try {
+      let triggerBuilder = ScriptApp.newTrigger(item.function);
+      
+      if (item.type === "CLOCK" || item.event === "CLOCK") {
+        // For time-based triggers - Note: we can't restore exact timing from uniqueId
+        // So we recreate a daily trigger as default. Customize as needed.
+        triggerBuilder = triggerBuilder.timeBased()
+          .everyDays(1)           // Change frequency as needed
+          .atHour(8)              // Change hour
+          .nearMinute(0);
+      } 
+      else if (item.type === "SPREADSHEET") {
+        triggerBuilder = triggerBuilder.forSpreadsheet(ss);
+        
+        if (item.event === "ON_OPEN") {
+          triggerBuilder.onOpen();
+        } else if (item.event === "ON_EDIT") {
+          triggerBuilder.onEdit();
+        } else if (item.event === "ON_CHANGE") {
+          triggerBuilder.onChange();
+        } else if (item.event === "ON_FORM_SUBMIT") {
+          triggerBuilder.onFormSubmit();
+        }
+      }
+      
+      triggerBuilder.create();
+      console.log(`✓ Created trigger for: ${item.function}`);
+      
+    } catch (e) {
+      console.error(`Failed to create trigger for ${item.function}:`, e);
+    }
+  });
+  
+  console.log("Trigger installation completed!");
+}
+
+/** Helper: Delete all existing triggers */
+function deleteAllTriggers() {
+  const triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(trigger => {
+    ScriptApp.deleteTrigger(trigger);
+  });
+  console.log(`Deleted ${triggers.length} existing triggers.`);
+}
+
+/**
+ * Safe export of triggers with schedule details
+ */
+function exportTriggersWithSchedule() {
+  const triggers = ScriptApp.getProjectTriggers();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  const data = triggers.map(trigger => {
+    const item = {
+      function: trigger.getHandlerFunction(),
+      type: trigger.getTriggerSource(),
+      event: trigger.getEventType(),
+      uniqueId: trigger.getUniqueId(),
+    };
+
+    // Safely extract time-based schedule info
+    if (trigger.getTriggerSource() === ScriptApp.TriggerSource.CLOCK) {
+      item.schedule = {
+        frequency: "time-based",
+        hours: safeGet(trigger, 'getHours'),
+        minutes: safeGet(trigger, 'getMinutes'),
+        nearMinute: safeGet(trigger, 'getNearMinute'),
+        dayOfWeek: safeGet(trigger, 'getDayOfWeek'),
+        everyWeeks: safeGet(trigger, 'getEveryWeeks'),
+        everyDays: safeGet(trigger, 'getEveryDays'),
+        everyHours: safeGet(trigger, 'getEveryHours'),
+        everyMinutes: safeGet(trigger, 'getEveryMinutes')
+      };
+    }
+
+    if (trigger.getTriggerSource() === ScriptApp.TriggerSource.SPREADSHEET) {
+      item.spreadsheetId = ss.getId();
+      item.spreadsheetName = ss.getName();
+    }
+
+    return item;
+  });
+
+  const jsonString = JSON.stringify(data, null, 2);
+  const blob = Utilities.newBlob(jsonString, "application/json", "triggers_backup_detailed.json");
+  
+  const file = DriveApp.createFile(blob);
+  console.log(`✅ Exported ${data.length} triggers → ${file.getUrl()}`);
+  
+  return file.getUrl();
+}
+
+/** Safe method caller */
+function safeGet(obj, methodName) {
+  try {
+    if (typeof obj[methodName] === 'function') {
+      const result = obj[methodName]();
+      return result !== null && result !== undefined ? result : null;
+    }
+  } catch (e) {
+    // Method not available on this trigger
+  }
+  return null;
+}
+
+/** Helper to describe frequency */
+function getTriggerFrequency(trigger) {
+  if (trigger.getEveryWeeks()) return `Every ${trigger.getEveryWeeks()} weeks`;
+  if (trigger.getEveryDays()) return `Every ${trigger.getEveryDays()} days`;
+  if (trigger.getEveryHours()) return `Every ${trigger.getEveryHours()} hours`;
+  if (trigger.getEveryMinutes()) return `Every ${trigger.getEveryMinutes()} minutes`;
+  return "Custom";
+}
+
+function exportTriggersToFile() {
+  const triggers = ScriptApp.getProjectTriggers();
+  const data = triggers.map(t => ({
+    function: t.getHandlerFunction(),
+    type: t.getTriggerSource(),
+    event: t.getEventType(),
+    uniqueId: t.getUniqueId()
+  }));
+  
+  const blob = Utilities.newBlob(JSON.stringify(data, null, 2), 
+                                "application/json", 
+                                "triggers_backup.json");
+  
+  DriveApp.createFile(blob);
+  console.log("Triggers exported to Drive as triggers_backup.json");
+}
+
+
 function extractSubstring(corpus, startString, endString) {
 
   return corpus.substring(
