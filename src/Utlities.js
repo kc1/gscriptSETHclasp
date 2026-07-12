@@ -1,4 +1,48 @@
 /**
+ * INSTALLER: delete all triggers and create new ones.
+ * Each function runs every N minutes, as specified in TRIGGER_CONFIG.
+ */
+function installMyTriggers() {
+  deleteAllTriggers();
+
+  // Format: [functionName, intervalInMinutes]
+  const TRIGGER_CONFIG = [
+    ["runUpdateWithScreenshotPaths", 15],
+    ["runAlcornPush", 15],
+    ["runPostToSethProp", 15],
+    ["runUpdateWithRoadandBuildingScreenshotPaths", 15],
+    ["runPostToBuildScreenshotsFromLink", 15],
+    ["runAlcornGeoJsonPush", 15],
+    ["toFiltered", 15],
+    ["runWaterBuildableUsingLLM", 15],
+    ["runStructurePresentPrompt", 15],
+    ["runRoadAvailableUsingLLM", 15]
+  ];
+
+  const created = [];
+
+  TRIGGER_CONFIG.forEach(([fnName, minutes]) => {
+    ScriptApp.newTrigger(fnName)
+      .timeBased()
+      .everyMinutes(minutes)
+      .create();
+
+    created.push(fnName);
+  });
+
+  console.log("✅ Triggers installed for:", created.join(", "));
+}
+
+/**
+ * Delete all project triggers.
+ */
+function deleteAllTriggers() {
+  const triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(t => ScriptApp.deleteTrigger(t));
+  console.log("🗑️ Deleted", triggers.length, "existing trigger(s).");
+}
+
+/**
  * Install triggers from a JSON backup file in Drive
  */
 function installTriggersFromBackup() {
@@ -70,11 +114,14 @@ function deleteAllTriggers() {
 /**
  * Safe export of triggers with schedule details
  */
+/**
+ * Best-effort detailed trigger export with schedule info
+ */
 function exportTriggersWithSchedule() {
   const triggers = ScriptApp.getProjectTriggers();
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const data = [];
   
-  const data = triggers.map(trigger => {
+  triggers.forEach(trigger => {
     const item = {
       function: trigger.getHandlerFunction(),
       type: trigger.getTriggerSource(),
@@ -82,7 +129,6 @@ function exportTriggersWithSchedule() {
       uniqueId: trigger.getUniqueId(),
     };
 
-    // Safely extract time-based schedule info
     if (trigger.getTriggerSource() === ScriptApp.TriggerSource.CLOCK) {
       item.schedule = {
         frequency: "time-based",
@@ -95,45 +141,34 @@ function exportTriggersWithSchedule() {
         everyHours: safeGet(trigger, 'getEveryHours'),
         everyMinutes: safeGet(trigger, 'getEveryMinutes')
       };
+      
+      // Extra attempt to get more info
+      try {
+        item.rawInfo = {
+          everyWeeks: trigger.getEveryWeeks ? trigger.getEveryWeeks() : null,
+          everyDays: trigger.getEveryDays ? trigger.getEveryDays() : null,
+          everyHours: trigger.getEveryHours ? trigger.getEveryHours() : null,
+        };
+      } catch (e) {}
     }
 
-    if (trigger.getTriggerSource() === ScriptApp.TriggerSource.SPREADSHEET) {
-      item.spreadsheetId = ss.getId();
-      item.spreadsheetName = ss.getName();
-    }
-
-    return item;
+    data.push(item);
   });
 
   const jsonString = JSON.stringify(data, null, 2);
   const blob = Utilities.newBlob(jsonString, "application/json", "triggers_backup_detailed.json");
   
   const file = DriveApp.createFile(blob);
-  console.log(`✅ Exported ${data.length} triggers → ${file.getUrl()}`);
-  
+  console.log(`Exported ${data.length} triggers to: ${file.getUrl()}`);
   return file.getUrl();
 }
 
-/** Safe method caller */
-function safeGet(obj, methodName) {
+function safeGet(obj, method) {
   try {
-    if (typeof obj[methodName] === 'function') {
-      const result = obj[methodName]();
-      return result !== null && result !== undefined ? result : null;
-    }
+    return (typeof obj[method] === "function") ? obj[method]() : null;
   } catch (e) {
-    // Method not available on this trigger
+    return null;
   }
-  return null;
-}
-
-/** Helper to describe frequency */
-function getTriggerFrequency(trigger) {
-  if (trigger.getEveryWeeks()) return `Every ${trigger.getEveryWeeks()} weeks`;
-  if (trigger.getEveryDays()) return `Every ${trigger.getEveryDays()} days`;
-  if (trigger.getEveryHours()) return `Every ${trigger.getEveryHours()} hours`;
-  if (trigger.getEveryMinutes()) return `Every ${trigger.getEveryMinutes()} minutes`;
-  return "Custom";
 }
 
 function exportTriggersToFile() {
