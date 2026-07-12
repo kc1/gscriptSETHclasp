@@ -34,7 +34,7 @@ function onOpen() {
     },
 
     {
-      name: "2A) Push to Named Bucket (up to 50), for home access-then run with IMAGEAI to generate screenshots",
+      name: "2A) Push to Named Bucket (up to 50), then run with IMAGEAI on VPS to generate water screenshots",
       functionName: "alcornPush",
     },
 
@@ -50,10 +50,6 @@ function onOpen() {
     {
       name: "2D)  Y/N on Water Buildability using WaterURL with LLM  ",
       functionName: "waterBuildableUsingLLM",
-    },
-    {
-      name: "Colour filtered rows blue ",
-      functionName: "testColorRows",
     },
     {
       name: "Copy to FILTERED ",
@@ -173,45 +169,45 @@ function tester() {
 }
 
 function runAlcornGeoJsonPush() {
-  const x = myTimedFunction(alcornGeoJsonPush, [9]);
+  const x = myTimedFunction(alcornGeoJsonPush, [9,10,11]); // every 30
 }
 
 function runPostToBuildScreenshotsFromLink() {
-  const x = myTimedFunction(postToBuildScreenshotsFromLink, [10]);
+  const x = myTimedFunction(postToBuildScreenshotsFromLink, [10,11,12]); //every 30
 }
 
 function runUpdateWithRoadandBuildingScreenshotPaths() {
-  const x = myTimedFunction(updateWithRoadandBuildingScreenshotPaths, [11]);
+  const x = myTimedFunction(updateWithRoadandBuildingScreenshotPaths, [11,12,13]); //every 30
 }
 
 function runRoadAvailableUsingLLM() {
   const x = myTimedFunction(
     roadAvailableUsingLLM,
-    [10, 11, 13, 14, 15, 16, 17],
+    [10, 11, 13, 14, 15, 16, 17], // every 15
   );
 }
 
 function runstructurePresentUsingLLM() {
   const x = myTimedFunction(
     structurePresentUsingLLM,
-    [12, 13, 14, 15, 16, 17, 18],
+    [12, 13, 14, 15, 16, 17, 18], // every 10
   );
 }
 
 function runAlcornPush() {
-  const x = myTimedFunction(alcornPush, [19]);
+  const x = myTimedFunction(alcornPush, [19,20]); // every 30
 }
 
 function runPostToSethProp() {
-  const x = myTimedFunction(postToSethProp, [10]);
+  const x = myTimedFunction(postToSethProp, [20,21]); // every 30
 }
 
-function runUpdateWithScreenshotPaths() {
-  const x = myTimedFunction(updateWithScreenshotPaths, [11]);
+function runUpdateWithWaterScreenshotPaths() {
+  const x = myTimedFunction(updateWithScreenshotPaths, [22,23]); // every 15
 }
 
 function runWaterBuildableUsingLLM() {
-  const x = myTimedFunction(waterBuildableUsingLLM, [12, 13, 14, 15, 16, 17]);
+  const x = myTimedFunction(waterBuildableUsingLLM, [24,1]); // every 10
 }
 
 function myTimedFunction(functionToRun, hoursToRun) {
@@ -262,43 +258,6 @@ function toFiltered() {
   for (const row of slicedNewRows) {
     const x = addRowFromObject(row, sheet2) 
   }
-  return "FIN";
-}
-
-function testColorRows() {
-  // colorRowsLightBlue([3, 7, 15, 22, 35, 50]);   // ← Put your row numbers here
-  // absoluteRow
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
-  const objArr = sheet2Json(sheet);
-  Logger.log("length: " + objArr.length);
-  const filteredRows = objArr.filter((row) => {
-    return (
-      row.RoadAvailable.length == 3 &&
-      row.StructuresPresent.length == 2 &&
-      row.WaterResponse.length == 3
-    );
-  });
-  const absoluteRowNumbers = filteredRows.map((row) => row.absoluteRow);
-  const out = colorRowsLightBlue(absoluteRowNumbers);
-  Logger.log(out);
-}
-
-function colorRowsLightBlue(rowNumbers) {
-  if (!rowNumbers || !Array.isArray(rowNumbers) || rowNumbers.length === 0)
-    return;
-
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const lastColumn = sheet.getLastColumn();
-  const lightBlue = "#4285f4";
-
-  // Remove duplicates and sort
-  const uniqueRows = [...new Set(rowNumbers)]
-    .filter((r) => Number.isInteger(r) && r >= 1)
-    .sort((a, b) => a - b);
-
-  uniqueRows.forEach((row) => {
-    sheet.getRange(row, 1, 1, lastColumn).setBackground(lightBlue);
-  });
   return "FIN";
 }
 
@@ -643,6 +602,9 @@ function StructuresPresentPromptTest(
 
 function postToSethProp() {
   // if this stops working -- update certificate.
+
+  // let collection = database.collection("alcornBucket"); this is hardcoded in in imageai
+
 
   var url = "https://image1.space/sethProp";
 
