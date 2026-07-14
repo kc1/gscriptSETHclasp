@@ -1,3 +1,38 @@
+function dailyProgress() {
+
+  const dateTime = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM d, yyyy h:mm a");
+  Logger.log(dateTime);
+  const headers = ["RoadURL", "RoadAvailable", "BuildingURL", "StructuresPresent", "WaterURL", "Buildable", "ContourURL"];
+    const progressSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("PROGRESS");
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+  const objArr = sheet2Json(sheet);
+  let outputRow = [];
+  outputRow["DateTime"] = dateTime;
+  for (const header of headers) {
+    const headerColumn = objArr.map((row) => row[header]);
+    Logger.log(headerColumn);
+    if (header.includes("URL")) {
+      const sumOfOdds = headerColumn.reduce((acc, curr) => {
+        if (curr.includes('http')) {
+          acc = acc + 1; // Modify the accumulator if condition is met
+        }
+        return acc; // CRITICAL: Always return the accumulator at the end
+      }, 0);
+      outputRow[header]= sumOfOdds
+    }
+  }
+  /*  Logger.log("length: " + objArr.length);
+   const sheetOneFilteredRows = objArr.filter((row) => {
+     return (
+       row.RoadAvailable.length == 3 &&
+       row.StructuresPresent.length == 2 &&
+       row.Buildable.length == 3
+     );
+   }); */
+    const x = addRowFromObject(outputRow, progressSheet) 
+
+}
 /**
  * INSTALLER: delete all triggers and create new ones.
  * Each function runs every N minutes, as specified in TRIGGER_CONFIG.
@@ -47,28 +82,28 @@ function deleteAllTriggers() {
  */
 function installTriggersFromBackup() {
   const fileName = "triggers_backup.json";   // Change if needed
-  
+
   // Find the file in Drive
   const files = DriveApp.getFilesByName(fileName);
   if (!files.hasNext()) {
     throw new Error(`File "${fileName}" not found in Drive.`);
   }
-  
+
   const file = files.next();
   const content = file.getBlob().getDataAsString();
   const triggerData = JSON.parse(content);
-  
+
   console.log(`Found ${triggerData.length} triggers to install.`);
-  
+
   // Delete existing triggers first to avoid duplicates
   deleteAllTriggers();
-  
+
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  
+
   triggerData.forEach(item => {
     try {
       let triggerBuilder = ScriptApp.newTrigger(item.function);
-      
+
       if (item.type === "CLOCK" || item.event === "CLOCK") {
         // For time-based triggers - Note: we can't restore exact timing from uniqueId
         // So we recreate a daily trigger as default. Customize as needed.
@@ -76,10 +111,10 @@ function installTriggersFromBackup() {
           .everyDays(1)           // Change frequency as needed
           .atHour(8)              // Change hour
           .nearMinute(0);
-      } 
+      }
       else if (item.type === "SPREADSHEET") {
         triggerBuilder = triggerBuilder.forSpreadsheet(ss);
-        
+
         if (item.event === "ON_OPEN") {
           triggerBuilder.onOpen();
         } else if (item.event === "ON_EDIT") {
@@ -90,15 +125,15 @@ function installTriggersFromBackup() {
           triggerBuilder.onFormSubmit();
         }
       }
-      
+
       triggerBuilder.create();
       console.log(`✓ Created trigger for: ${item.function}`);
-      
+
     } catch (e) {
       console.error(`Failed to create trigger for ${item.function}:`, e);
     }
   });
-  
+
   console.log("Trigger installation completed!");
 }
 
@@ -120,7 +155,7 @@ function deleteAllTriggers() {
 function exportTriggersWithSchedule() {
   const triggers = ScriptApp.getProjectTriggers();
   const data = [];
-  
+
   triggers.forEach(trigger => {
     const item = {
       function: trigger.getHandlerFunction(),
@@ -141,7 +176,7 @@ function exportTriggersWithSchedule() {
         everyHours: safeGet(trigger, 'getEveryHours'),
         everyMinutes: safeGet(trigger, 'getEveryMinutes')
       };
-      
+
       // Extra attempt to get more info
       try {
         item.rawInfo = {
@@ -149,7 +184,7 @@ function exportTriggersWithSchedule() {
           everyDays: trigger.getEveryDays ? trigger.getEveryDays() : null,
           everyHours: trigger.getEveryHours ? trigger.getEveryHours() : null,
         };
-      } catch (e) {}
+      } catch (e) { }
     }
 
     data.push(item);
@@ -157,7 +192,7 @@ function exportTriggersWithSchedule() {
 
   const jsonString = JSON.stringify(data, null, 2);
   const blob = Utilities.newBlob(jsonString, "application/json", "triggers_backup_detailed.json");
-  
+
   const file = DriveApp.createFile(blob);
   console.log(`Exported ${data.length} triggers to: ${file.getUrl()}`);
   return file.getUrl();
@@ -179,11 +214,11 @@ function exportTriggersToFile() {
     event: t.getEventType(),
     uniqueId: t.getUniqueId()
   }));
-  
-  const blob = Utilities.newBlob(JSON.stringify(data, null, 2), 
-                                "application/json", 
-                                "triggers_backup.json");
-  
+
+  const blob = Utilities.newBlob(JSON.stringify(data, null, 2),
+    "application/json",
+    "triggers_backup.json");
+
   DriveApp.createFile(blob);
   console.log("Triggers exported to Drive as triggers_backup.json");
 }

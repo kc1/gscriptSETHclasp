@@ -187,7 +187,7 @@ function runRoadAvailableUsingLLM() {
   );
 }
 
-function runstructurePresentUsingLLM() {
+function runStructurePresentUsingLLM() {
   const x = myTimedFunction(
     structurePresentUsingLLM,
     [12, 13, 14, 15, 16, 17, 18], // every 10
