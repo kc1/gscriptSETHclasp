@@ -987,10 +987,10 @@ function updateWithRoadandBuildingScreenshotPaths() {
   baseUpdateWithScreenshotPaths("alcornGeoJsonBucket", 20, isPushed);
 }
 
-function updateWithBuildingScreenshotPaths() {
-  const isPushed = (x) => x.RoadURL === "PUSHED";
-  baseUpdateWithScreenshotPaths("alcornGeoJsonBucket", 20, isPushed);
-}
+// function updateWithBuildingScreenshotPaths() {
+//   const isPushed = (x) => x.RoadURL === "PUSHED";
+//   baseUpdateWithScreenshotPaths("alcornGeoJsonBucket", 20, isPushed);
+// }
 
 function autoUpdateWithScreenshotPaths(collectionName, numberToPull) {
   // const responseObjArr = getMultipleSelectedRowObjects();
@@ -1130,13 +1130,13 @@ function baseUpdateWithScreenshotPaths(
         // ie UPDATED step 5.
         var C = updateCell(sheet, myRow, "RoadURL", roadFile);
       } else {
-        var C = updateCell(sheet, myRow, "RoadURL", "");
+        var C = updateCell(sheet, myRow, "RoadURL", "FAILED");
       }
       if (buildingFile.startsWith("http")) {
         // ie UPDATED step 5.
         var C = updateCell(sheet, myRow, "BuildingURL", buildingFile);
       } else {
-        var C = updateCell(sheet, myRow, "BuildingURL", "");
+        var C = updateCell(sheet, myRow, "BuildingURL", "FAILED");
       }
     }
   }
